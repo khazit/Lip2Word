@@ -40,7 +40,7 @@ def capture_process_frames(path, size) :
     count = 0
     success = 1
     size_frame = 256 # size of the original frame from the video
-    number_frames = 29
+    number_frames = 29 # all videos are 29 frames
     all_frames = np.zeros((number_frames, size, size))
     while success: 
         success, image = vidObj.read()
@@ -91,7 +91,7 @@ if __name__ == '__main__':
     # Iterate over the training, validation and test sets
     for set_type in ['train', 'val', 'test'] :
         
-        # ^ really ugly, may need to change it
+        # really ugly, may need to change it
         n_examples = 0
         pathlist = Path(args.data_dir).glob('**/'+set_type+'/*.mp4')
         for path in pathlist:
