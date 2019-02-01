@@ -2,6 +2,15 @@ import cv2
 import numpy as np
 from tqdm import tqdm
 from pathlib import Path
+import argparse
+
+parser = argparse.ArgumentParser()
+parser.add_argument('--data_dir', 
+                    default='/mnt/disks/sdb/data/LRDataset/sample_lipread_mp4/', 
+                    help="Directory with the dataset")
+parser.add_argument('--output_dir', 
+                    default='', 
+                    help="Where to write the new data")
 
 def resize_frame(image, size, offset) :
     '''
@@ -70,20 +79,42 @@ def create_dict_word_list() :
     return my_dict
 
 if __name__ == '__main__':
+    args = parser.parse_args()
+    
+    # Create the word to label dict
     label_dict = create_dict_word_list()
+    
+    # Somes useful variables
     size = 64 # size of the frames
     n_frames = 29 # number of frames
+    
+    # Iterate over the training, validation and test sets
     for set_type in ['train', 'val', 'test'] :
+        
+        # ^ really ugly, may need to change it
         n_examples = 0
-        pathlist = Path("/mnt/disks/sdb/data/LRDataset/sample_lipread_mp4/").glob('**/'+set_type+'/*.mp4')
+        pathlist = Path(args.data_dir).glob('**/'+set_type+'/*.mp4')
         for path in pathlist:
             n_examples += 1  # number of .mp4 files
+        print("{} files found in {} directory".format(n_examples, set_type))
+        
+        # Create empty matrices 
         data_features = np.zeros((n_examples, n_frames, size, size)).astype(np.float32)
         data_labels = np.zeros((n_examples)).astype(np.float32)
         count = 0
         pathlist = Path("/mnt/disks/sdb/data/LRDataset/sample_lipread_mp4/").glob('**/'+set_type+'/*.mp4')
+        
+        # Iterate over .mp4 files in every sub directory (train, val, test)
+        print("Processing {} data".format(set_type))
         for path in tqdm(pathlist):
             data_features[count] = capture_process_frames(str(path), size)
             data_labels[count] = label_dict[get_label_from_path(str(path))]
             count += 1
-        #np.savez_compressed(file='data_'+set_type, array1=data_features, array2=data_labels)
+        
+        # Saves every subdirectory data into a seperate .npz file  
+        print("Saving {} data to {}".format(set_type, args.output_dir))
+        np.savez_compressed(file=args.output_dir+'data_'+set_type, 
+                            array1=data_features, 
+                            array2=data_labels)
+        
+    print("Done building datasets")
