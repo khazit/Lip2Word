@@ -15,3 +15,13 @@
 * 2D models are far more accurate. Multiple Towers are slightly more accurate than Early Fusion (+- 4%)
 * Best top-1 accuracy around 60% (500 different words)
 
+## Large-scale Classification with Convolutional Neural Networks 
+https://www.cv-foundation.org/openaccess/content_cvpr_2014/papers/Karpathy_Large-scale_Video_Classification_2014_CVPR_paper.pdf
+
+#### Architecture :
+ * An effecive approach to speeding up the runtime performance of CNNs is to modify the architecture to contain two separate streams of processing : a context stream that learns features on low-resolution frames and a high-resolution fovea stream that only operates on the middle portion of the frame.
+ * The multiresolution architecture aims to strike a compromise by having two seperate streams of processing over two spatial resolutions. The context stream receives the downsampled frames at half the original spatial resolution, while the fovea steam receives the center region at the original resolution.
+ * Must ensure that both streams still terminate in a same size layer to be fed to the fully connected layer.
+
+#### Training :
+ * SGD, mini-batch (32), momentum of 0.9, weight decay of 0.0005. Initialized with learning rate of 1E-3 (decreasing)
