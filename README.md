@@ -27,3 +27,15 @@ https://www.cv-foundation.org/openaccess/content_cvpr_2014/papers/Karpathy_Large
 
 #### Training :
  * SGD, mini-batch (32), momentum of 0.9, weight decay of 0.0005. Initialized with learning rate of 1E-3 (decreasing)
+
+## 3D Convolutional Neural Networks for Human Action Recognition
+http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.442.8617&rep=rep1&type=pdf
+
+#### Architecture
+ 1. Hardwired kernels to generate multiple chanels of information (difficult to implement)
+ 2. 3D convolution with a kernel of size (7x7x3)
+ 3. 2x2 subsampling layer
+ 4. 3D convolution with a kernel of size (7x6x3) **Not a square because the input image is 60x40**
+ 5. 3x3 subsampling
+ 6. 2D convolution of 7x4
+ 7. fully connected layer
