@@ -1,3 +1,8 @@
+'''
+Build the dataset by preprocessing all the videos (ie. reframed around the mouth and resized to 64x64) and adding the labels.
+Save the datasets as numpy arrays (3 .npz files, training, validation and testing)
+'''
+
 import cv2
 import numpy as np
 from tqdm import tqdm
