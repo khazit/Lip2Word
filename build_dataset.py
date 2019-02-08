@@ -46,14 +46,14 @@ def capture_process_frames(path, size) :
     success = 1
     size_frame = 256 # size of the original frame from the video
     number_frames = 29 # all videos are 29 frames
-    all_frames = np.zeros((number_frames, size, size))
+    all_frames = np.zeros((size, size, number_frames))
     while success: 
         success, image = vidObj.read()
         if success :
             image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
             image = resize_frame(image, size_frame-180, offset=35)
             image = cv2.resize(image, dsize=(size, size), interpolation=cv2.INTER_LINEAR)
-            all_frames[count] = image
+            all_frames[:, :, count] = image
             count += 1
     return all_frames
 
@@ -104,7 +104,7 @@ if __name__ == '__main__':
         print("{} files found in {} directory".format(n_examples, set_type))
         
         # Create empty matrices 
-        data_features = np.zeros((n_examples, n_frames, size, size)).astype(np.float32)
+        data_features = np.zeros((n_examples, size, size, n_frames)).astype(np.float32)
         data_labels = np.zeros((n_examples)).astype(np.float32)
         count = 0
         pathlist = Path("/mnt/disks/sdb/data/LRDataset/sample_lipread_mp4/").glob('**/'+set_type+'/*.mp4')
