@@ -11,7 +11,7 @@ import argparse
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--data_dir', 
-                    default='/mnt/disks/sdb/data/LRDataset/sample_lipread_mp4/', 
+                    default='', 
                     help="Directory with the dataset")
 parser.add_argument('--output_dir', 
                     default='', 
@@ -61,11 +61,11 @@ def get_label_from_path(path) :
     '''
     Find the label (ie the word) from the path of the .mp4
     Args :
-        - path : path to the .mp4 (eg : /mnt/disks/sdb/data/LRDataset/lipread_mp4/ABOUT/****)
+        - path : path to the .mp4 (eg : /home/kh4zit/data/lipread_mp4/ABOUT/****)
     Returns :
         - a word (str)
     '''
-    return path.split('/')[7]
+    return path.split('/')[5]
 
 def create_dict_word_list() :
     '''
@@ -77,7 +77,7 @@ def create_dict_word_list() :
     '''
     count = 0
     my_dict = dict()
-    with open('/mnt/disks/sdb/data/LRDataset/word_list.txt', 'r') as f:
+    with open('/home/kh4zit/data/word_list.txt', 'r') as f:
         for line in f:
             my_dict.update({line[:-1] : count})
             count += 1
@@ -107,7 +107,7 @@ if __name__ == '__main__':
         data_features = np.zeros((n_examples, size, size, n_frames)).astype(np.float32)
         data_labels = np.zeros((n_examples)).astype(np.float32)
         count = 0
-        pathlist = Path("/mnt/disks/sdb/data/LRDataset/sample_lipread_mp4/").glob('**/'+set_type+'/*.mp4')
+        pathlist = Path("/home/kh4zit/data/sample_lipread_mp4/").glob('**/'+set_type+'/*.mp4')
         
         # Iterate over .mp4 files in every sub directory (train, val, test)
         print("Processing {} data".format(set_type))
