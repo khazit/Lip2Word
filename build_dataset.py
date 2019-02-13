@@ -1,6 +1,6 @@
 '''
 Build the dataset by preprocessing all the videos (ie. reframed around the mouth and resized to 64x64) and adding the labels.
-Save the datasets as numpy arrays (3 .npz files, training, validation and testing)
+Save the datasets as numpy arrays (3 .npz files for training, validation and testing)
 '''
 
 import cv2
@@ -107,7 +107,7 @@ if __name__ == '__main__':
         data_features = np.zeros((n_examples, size, size, n_frames)).astype(np.float32)
         data_labels = np.zeros((n_examples)).astype(np.float32)
         count = 0
-        pathlist = Path("/home/kh4zit/data/sample_lipread_mp4/").glob('**/'+set_type+'/*.mp4')
+        pathlist = Path(args.data_dir).glob('**/'+set_type+'/*.mp4')
         
         # Iterate over .mp4 files in every sub directory (train, val, test)
         print("Processing {} data".format(set_type))
