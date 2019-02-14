@@ -29,6 +29,7 @@ if __name__ == '__main__' :
     train_data = train_data[randomize]
     train_labels = train_labels[randomize]
 
+    print("Done loading data")
     print("Data summary :\n\tExamples : {}\n\tLabels : {}"
          .format(train_data.shape,
                  train_labels.shape))
