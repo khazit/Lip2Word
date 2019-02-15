@@ -119,7 +119,7 @@ if __name__ == '__main__':
         # Saves every subdirectory data into a seperate .npz file  
         print("Saving {} data to {}".format(set_type, args.output_dir))
         np.savez_compressed(file=args.output_dir+'data_'+set_type, 
-                            array1=data_features, 
-                            array2=data_labels)
+                            array1=data_features/np.float32(255), 
+                            array2=data_labels.astype(np.int32))
         
     print("Done building datasets")

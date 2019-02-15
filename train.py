@@ -22,8 +22,8 @@ if __name__ == '__main__' :
     # Load the training dataset
     print("Loading dataset from "+args.data_dir+"data_train.npz")
     train = np.load(file=args.data_dir+'data_train.npz')
-    train_data = train.f.array1/np.float32(255)
-    train_labels = train.f.array2.astype(np.int32)
+    train_data = train.f.array1
+    train_labels = train.f.array2
     randomize = np.arange(len(train_data))
     np.random.shuffle(randomize)
     train_data = train_data[randomize]

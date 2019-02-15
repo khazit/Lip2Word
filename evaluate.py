@@ -22,8 +22,8 @@ if __name__ == '__main__' :
     # Load the dataset
     print("Loading dataset from "+args.data_dir+args.data_name)
     val = np.load(file=args.data_dir+args.data_name)
-    val_data = val.f.array1/np.float32(255)
-    val_labels = val.f.array2.astype(np.int32)
+    val_data = val.f.array1
+    val_labels = val.f.array2
     randomize = np.arange(len(val_data))
     np.random.shuffle(randomize)
     val_data = val_data[randomize]
