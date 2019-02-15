@@ -11,14 +11,17 @@ parser.add_argument('--data_dir',
 parser.add_argument('--model_dir',
                     default=None,
                     help="Model directory")
+parser.add_argument('--data_name',
+                    default='data_val.npz',
+                    help='Name of the datafile')
 
 
 if __name__ == '__main__' :
     args = parser.parse_args()
     
     # Load the dataset
-    print("Loading dataset from "+args.data_dir+"data_val.npz")
-    val = np.load(file=args.data_dir+'data_val.npz')
+    print("Loading dataset from "+args.data_dir+args.data_name)
+    val = np.load(file=args.data_dir+args.data_name)
     val_data = val.f.array1/np.float32(255)
     val_labels = val.f.array2.astype(np.int32)
     randomize = np.arange(len(val_data))
