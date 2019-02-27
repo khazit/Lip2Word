@@ -48,7 +48,7 @@ Pipelining overlaps the preprocessing and model execution of a training step. Wh
 ```python
 dataset = dataset.prefetch(buffer_size=FLAGS.prefetch_buffer_size)
 return dataset
+```
 
 ## Importing Data - Tensorflow
 https://www.tensorflow.org/guide/datasets#basic_mechanics
-```
