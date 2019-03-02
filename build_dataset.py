@@ -67,7 +67,7 @@ def get_label_from_path(path) :
     '''
     return path.split('/')[5]
 
-def create_dict_word_list() :
+def create_dict_word_list(data_dir) :
     '''
     Create a dict used to transfrom labels from str to int
     Args :
@@ -77,7 +77,7 @@ def create_dict_word_list() :
     '''
     count = 0
     my_dict = dict()
-    with open('/home/kh4zit/data/word_list.txt', 'r') as f:
+    with open(data_dir+'word_list.txt', 'r') as f:
         for line in f:
             my_dict.update({line[:-1] : count})
             count += 1
@@ -87,7 +87,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
     
     # Create the word to label dict
-    label_dict = create_dict_word_list()
+    label_dict = create_dict_word_list(args.data_dir)
     
     # Somes useful variables
     size = 64 # size of the frames

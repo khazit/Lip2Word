@@ -35,10 +35,10 @@ if __name__ == '__main__' :
                  train_labels.shape))
 
     # Create the estimator
-    print("Creating estimator from/to "+"model_dir/"+args.model_dir)
+    print("Creating estimator from/to "+"experiments/"+args.model_dir)
     cnn_classifier = tf.estimator.Estimator(
         model_fn=cnn_model_fn,
-        model_dir="model_dir/"+args.model_dir)
+        model_dir="experiments/"+args.model_dir)
 
     # Define input function
     train_input_fn = tf.estimator.inputs.numpy_input_fn(
