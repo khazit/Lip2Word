@@ -39,3 +39,16 @@ http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.442.8617&rep=rep1&type=
  5. 3x3 subsampling
  6. 2D convolution of 7x4
  7. fully connected layer
+
+## Data pipeline using tf.data to optimize performance
+https://www.tensorflow.org/guide/performance/datasets
+
+#### Pipelining
+Pipelining overlaps the preprocessing and model execution of a training step. While the accelerator is performing training step N, the CPU is preparing the data for step N+1 (to reduce idle time)
+```python
+dataset = dataset.prefetch(buffer_size=FLAGS.prefetch_buffer_size)
+return dataset
+```
+
+## Importing Data - Tensorflow
+https://www.tensorflow.org/guide/datasets#basic_mechanics
