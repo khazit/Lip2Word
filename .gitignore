@@ -1,5 +1,5 @@
 data/**
-model_dir/**
+experiments/**
 
 .DS_Store
 .ipynb_checkpoints
