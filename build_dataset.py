@@ -1,6 +1,6 @@
 '''
 Build the dataset by preprocessing all the videos (ie. reframed around the mouth and resized to 64x64) and adding the labels.
-Save the datasets as numpy arrays (3 .npz files for training, validation and testing)
+Save each video to a 1856x64 image.
 '''
 
 import cv2
