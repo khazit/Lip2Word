@@ -57,18 +57,37 @@ def capture_process_frames(path, size) :
             count += 1
     return all_frames
 
-def get_label_from_path(path) :
+def get_label_from_path(path, label_dict) :
     '''
-    Find the label (ie the word) from the path of the .mp4
+    Find the label from the path of the .mp4
     Args :
-        - path : path to the .mp4 (eg : /home/kh4zit/data/lipread_mp4/ABOUT/****)
+        - path : path to the .mp4
+        - label_dict : a dict to match a word to a label
     Returns :
-        - a word (str)
+        - label (int)
     '''
-    return path.split('/')[5]
+    return label_dict[path.split('/')[5]]
+
+def create_dict_word_list(path) :
+    '''
+    Create a dict used to transfrom labels from str to int
+    Args :
+        - path : Path to the word list
+    Return :
+        - Python dictionnary {Word : Label}
+    '''
+    count = 0
+    my_dict = dict()
+    with open(path+'word_list.txt', 'r') as f:
+        for line in f:
+            my_dict.update({line[:-1] : count})
+            count += 1
+    return my_dict
+
 
 if __name__ == '__main__':
     args = parser.parse_args()
+    label_dict = create_dict_word_list(args.data_dir)
     
     # Somes useful variables
     size = 64 # size of the frames
@@ -87,7 +106,11 @@ if __name__ == '__main__':
         print("Processing {} data".format(set_type))
         for path in tqdm(pathlist):
             image = capture_process_frames(str(path), size) 
-            cv2.imwrite(args.output_dir+'{}/{}_{}.jpg'.format(set_type, get_label_from_path(str(path)), count), image)
+            cv2.imwrite(args.output_dir+'{}/{}_{}_{}.jpg'.format(set_type, 
+                                                              get_label_from_path(str(path), label_dict), 
+                                                              str(path).split('/')[5],   
+                                                              count),
+                        image)
             count += 1
 
     print("Done building datasets")
