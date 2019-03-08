@@ -22,7 +22,7 @@ def import_image(filename, label):
     video = tf.reshape(image, shape=(64, 64, 29))
     return video, label
 
-def input_fn(is_training, filenames, labels, batch_size):
+def input_fn(is_training, filenames, labels, batch_size=None):
     '''
     Input function
     Files names have format "{label}_{word}_{id}.jpg"
@@ -45,7 +45,7 @@ def input_fn(is_training, filenames, labels, batch_size):
                   )
     else:
         dataset = (tf.data.Dataset.from_tensor_slices((tf.constant(filenames), tf.constant(labels)))
-                   .map(parse_fn)
-                   .batch(num_samples)
+                   .map(import_fn)
+                   .batch(len(filenames))
                   )
     return dataset.make_one_shot_iterator().get_next() 

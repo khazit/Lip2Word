@@ -49,9 +49,17 @@ if __name__ == '__main__' :
         model_dir=os.path.join("experiments", args.model_dir))
 
     print("Training classifier for {} steps".format(args.n_steps))
-    cnn_classifier.train(
-        input_fn=lambda:input_fn(True,
-                                 train_filenames,
-                                 train_labels,
-                                 32),
-        steps=int(args.n_steps))
+    n_steps = int(args.n_steps)
+    for i in range(n_steps//1000):
+        cnn_classifier.train(
+            input_fn=lambda:input_fn(True,
+                                     train_filenames,
+                                     train_labels,
+                                     32),
+            steps=1000)
+        cnn_classifier.evaluate(
+            input_fn=lambda:input_fn(False,
+                                     val_filenames,
+                                     val_labels))
+    print("Done training")
+    
