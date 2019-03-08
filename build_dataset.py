@@ -1,6 +1,6 @@
 '''
 Build the dataset by preprocessing all the videos (ie. reframed around the mouth and resized to 64x64) and adding the labels.
-Save the datasets as numpy arrays (3 .npz files for training, validation and testing)
+Save each video to a 1856x64 image.
 '''
 
 import cv2
@@ -46,47 +46,47 @@ def capture_process_frames(path, size) :
     success = 1
     size_frame = 256 # size of the original frame from the video
     number_frames = 29 # all videos are 29 frames
-    all_frames = np.zeros((size, size, number_frames))
+    all_frames = np.zeros((size*number_frames, size))
     while success: 
         success, image = vidObj.read()
         if success :
             image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
             image = resize_frame(image, size_frame-180, offset=35)
             image = cv2.resize(image, dsize=(size, size), interpolation=cv2.INTER_LINEAR)
-            all_frames[:, :, count] = image
+            all_frames[count*size:size*(count+1), :] = image
             count += 1
     return all_frames
 
-def get_label_from_path(path) :
+def get_label_from_path(path, label_dict) :
     '''
-    Find the label (ie the word) from the path of the .mp4
+    Find the label from the path of the .mp4
     Args :
-        - path : path to the .mp4 (eg : /home/kh4zit/data/lipread_mp4/ABOUT/****)
+        - path : path to the .mp4
+        - label_dict : a dict to match a word to a label
     Returns :
-        - a word (str)
+        - label (int)
     '''
-    return path.split('/')[5]
+    return label_dict[path.split('/')[5]]
 
-def create_dict_word_list(data_dir) :
+def create_dict_word_list(path) :
     '''
     Create a dict used to transfrom labels from str to int
     Args :
-        - None
+        - path : Path to the word list
     Return :
         - Python dictionnary {Word : Label}
     '''
     count = 0
     my_dict = dict()
-    with open(data_dir+'word_list.txt', 'r') as f:
+    with open(path+'word_list.txt', 'r') as f:
         for line in f:
             my_dict.update({line[:-1] : count})
             count += 1
     return my_dict
 
+
 if __name__ == '__main__':
     args = parser.parse_args()
-    
-    # Create the word to label dict
     label_dict = create_dict_word_list(args.data_dir)
     
     # Somes useful variables
@@ -95,31 +95,22 @@ if __name__ == '__main__':
     
     # Iterate over the training, validation and test sets
     for set_type in ['train', 'val', 'test'] :
-        
-        # really ugly, may need to change it
-        n_examples = 0
-        pathlist = Path(args.data_dir).glob('**/'+set_type+'/*.mp4')
-        for path in pathlist:
-            n_examples += 1  # number of .mp4 files
-        print("{} files found in {} directory".format(n_examples, set_type))
-        
-        # Create empty matrices 
-        data_features = np.zeros((n_examples, size, size, n_frames)).astype(np.float32)
-        data_labels = np.zeros((n_examples)).astype(np.float32)
+        # Useful for naming the image files
         count = 0
-        pathlist = Path(args.data_dir).glob('**/'+set_type+'/*.mp4')
+        
+        # Create empty matrix
+        image = np.zeros((n_frames*size, size)).astype(np.float32)
         
         # Iterate over .mp4 files in every sub directory (train, val, test)
+        pathlist = Path(args.data_dir).glob('**/'+set_type+'/*.mp4')
         print("Processing {} data".format(set_type))
         for path in tqdm(pathlist):
-            data_features[count] = capture_process_frames(str(path), size)
-            data_labels[count] = label_dict[get_label_from_path(str(path))]
+            image = capture_process_frames(str(path), size) 
+            cv2.imwrite(args.output_dir+'{}/{}_{}_{}.jpg'.format(set_type, 
+                                                              get_label_from_path(str(path), label_dict), 
+                                                              str(path).split('/')[5],   
+                                                              count),
+                        image)
             count += 1
-        
-        # Saves every subdirectory data into a seperate .npz file  
-        print("Saving {} data to {}".format(set_type, args.output_dir))
-        np.savez_compressed(file=args.output_dir+'data_'+set_type, 
-                            array1=data_features/np.float32(255), 
-                            array2=data_labels.astype(np.int32))
-        
+
     print("Done building datasets")

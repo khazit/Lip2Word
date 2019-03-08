@@ -21,7 +21,7 @@ def cnn_model_fn(features, labels, mode):
     num_classes = 10
     
     # Input layer 
-    input_layer = tf.reshape(features["x"], [-1, 64, 64, num_frames])
+    input_layer = tf.reshape(features, [-1, 64, 64, num_frames])
     
     # Convolutional Layer #1 : 
     # on every frame separately , shared weights
