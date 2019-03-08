@@ -20,7 +20,6 @@ def import_image(filename, label):
     # Convert to range [0,1]
     image = tf.image.convert_image_dtype(image_decoded, tf.float32)
     video = tf.reshape(image, shape=(64, 64, 29))
-    video = tf.print(video, data=[video[:, :, 1]])
     return video, label
 
 def input_fn(is_training, filenames, labels, batch_size):
