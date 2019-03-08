@@ -38,8 +38,9 @@ def input_fn(is_training, filenames, labels, batch_size):
     if is_training:
         dataset = (tf.data.Dataset.from_tensor_slices((tf.constant(filenames), tf.constant(labels)))
                    .shuffle(num_samples)
-                   .map(import_fn, num_parallel_calls=1)
+                   .map(import_fn)
                    .batch(batch_size)
+                   .repeat()
                    .prefetch(1)
                   )
     else:
