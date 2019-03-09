@@ -8,6 +8,7 @@ import numpy as np
 from tqdm import tqdm
 from pathlib import Path
 import argparse
+import os
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--data_dir', 
@@ -87,9 +88,17 @@ def create_dict_word_list(path) :
 
 if __name__ == '__main__':
     args = parser.parse_args()
-    label_dict = create_dict_word_list(args.data_dir)
+
+    # Tests
+    assert os.path.isdir(args.data_dir), "No data directory found"
+    assert os.path.isdir(args.output_dir), "No output directory found"
+    print("{} files found.".format(
+        len([path for path in Path(args.data_dir).glob('**/**/*.mp4')])))
+    print("Saving files to "+args.output_dir)
+    input("Press the <ENTER> key to continue...")
     
     # Somes useful variables
+    label_dict = create_dict_word_list(args.data_dir)
     size = 64 # size of the frames
     n_frames = 29 # number of frames
     
