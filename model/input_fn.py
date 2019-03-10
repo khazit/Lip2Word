@@ -38,14 +38,16 @@ def input_fn(is_training, filenames, labels, batch_size=None):
     if is_training:
         dataset = (tf.data.Dataset.from_tensor_slices((tf.constant(filenames), tf.constant(labels)))
                    .shuffle(num_samples)
-                   .map(import_fn)
-                   .batch(batch_size)
+                   .apply(tf.contrib.data.map_and_batch(map_func=import_image, 
+                                                        batch_size=batch_size,
+                                                        num_parallel_calls=4))
                    .repeat()
-                   .prefetch(1)
+                   .prefetch(batch_size)
                   )
     else:
         dataset = (tf.data.Dataset.from_tensor_slices((tf.constant(filenames), tf.constant(labels)))
-                   .map(import_fn)
-                   .batch(len(filenames))
+                   .apply(tf.contrib.data.map_and_batch(map_func=import_image, 
+                                                        batch_size=1000,
+                                                        num_parallel_calls=4))
                   )
     return dataset.make_one_shot_iterator().get_next() 
