@@ -50,16 +50,11 @@ if __name__ == '__main__' :
 
     print("Training classifier for {} steps".format(args.n_steps))
     n_steps = int(args.n_steps)
-    for i in range(n_steps//1000):
-        cnn_classifier.train(
-            input_fn=lambda:input_fn(True,
-                                     train_filenames,
-                                     train_labels,
-                                     32),
-            steps=1000)
-        cnn_classifier.evaluate(
-            input_fn=lambda:input_fn(False,
-                                     val_filenames,
-                                     val_labels))
+    cnn_classifier.train(
+        input_fn=lambda:input_fn(True,
+                                 train_filenames,
+                                 train_labels,
+                                 32),
+        steps=n_steps)
     print("Done training")
     

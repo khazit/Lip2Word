@@ -18,7 +18,7 @@ def cnn_model_fn(features, labels, mode):
     '''
     # Useful variables
     num_frames = 29
-    num_classes = 10
+    num_classes = 500
     
     # Input layer 
     input_layer = tf.reshape(features, [-1, 64, 64, num_frames])
@@ -152,16 +152,16 @@ def cnn_model_fn(features, labels, mode):
             eval_metric_ops=metrics)
     
     # Training stops here
-    starter_learning_rate = 0.01
+    starter_learning_rate = 0.00003
     global_step = tf.train.get_global_step()
     learning_rate = tf.train.exponential_decay(starter_learning_rate, 
                                                global_step,
-                                               1000, 
+                                               500, 
                                                0.76, 
                                                staircase=False)
     optimizer = tf.train.MomentumOptimizer(
         learning_rate=learning_rate,
-        momentum=0.9)
+        momentum=0.5)
     train_op = optimizer.minimize(
         loss=loss,
         global_step=global_step)
