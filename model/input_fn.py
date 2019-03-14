@@ -47,7 +47,7 @@ def input_fn(is_training, filenames, labels, batch_size=None):
     else:
         dataset = (tf.data.Dataset.from_tensor_slices((tf.constant(filenames), tf.constant(labels)))
                    .apply(tf.contrib.data.map_and_batch(map_func=import_image, 
-                                                        batch_size=1000,
+                                                        batch_size=500,
                                                         num_parallel_calls=4))
                   )
     return dataset.make_one_shot_iterator().get_next() 

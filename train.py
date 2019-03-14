@@ -30,13 +30,16 @@ if __name__ == '__main__' :
     assert os.path.isdir(val_dir), "No validation directory found"
     # Training data
     train_pathlist = Path(train_dir).glob("*.jpg")
-    train_filenames = [str(path) for path in train_pathlist] # doesn't generalize
-    train_labels = [int(s.split("_")[1][-1]) for s in train_filenames]
+    train_filenames = [str(path) for path in train_pathlist]
+    train_labels = [int(s.split("_")[1].split('/')[2]) for s in train_filenames]
     # Validation data
     val_pathlist = Path(val_dir).glob("*.jpg")
-    val_filenames = [str(path) for path in val_pathlist] # doesn't generalize
-    val_labels = [int(s.split("_")[1][-1]) for s in val_filenames]
+    val_filenames = [str(path) for path in val_pathlist]
+    val_labels = [int(s.split("_")[1].split('/')[2]) for s in val_filenames]
     
+    print(train_filenames[:10])
+    print(train_labels[:10])
+ 
     print("Done loading data")
     print("Data summary :\n\tTraining set size {}\n\tValidation set size {}".format(
         len(train_filenames),

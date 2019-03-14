@@ -29,7 +29,7 @@ if __name__ == '__main__' :
     # Training data
     test_pathlist = Path(test_dir).glob("*.jpg")
     test_filenames = [str(path) for path in test_pathlist] # doesn't generalize
-    test_labels = [int(s.split("_")[1][-1]) for s in test_filenames]
+    test_labels = [int(s.split("_")[1].split('/')[2]) for s in test_filenames]
     
     print("Done loading data")
     print("Test set size {}\n".format(
