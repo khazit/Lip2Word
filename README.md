@@ -1,4 +1,4 @@
-# lipReader
+# CNN
 
 ## Lip Reading in the Wild - Joon Son Chung and Andrew Zisserman
 * In lip-reading there is a fundamental limitation on performance due to homophemes (sets of words that sound different but involves identical movements of the speaker's lips). Thus they cannot be distinguished using visual information alone ("mark", "park" and "bark" for eg.) **Need to take account of this ambiguity when assessing the performance of the model**
@@ -52,3 +52,12 @@ return dataset
 
 ## Importing Data - Tensorflow
 https://www.tensorflow.org/guide/datasets#basic_mechanics
+
+# RNN
+## Reccurent Neural Networks - Coursera
+https://fr.coursera.org/lecture/nlp-sequence-models/recurrent-neural-network-model-ftkzt
+#### RNN Model
+A feature learned in t, can generalize quickly to something in t+i. It's similar to what convolutional neural networks do. Where things learned for one part of the image can generalize quickly for other parts of the image.
+
+#### Different types of RNNs
+Input the frames one at a time. Rather than having to produce an output at every time-step we can have the RNN see all the frames and prduce an output at the last time-step. Many-to-one architecture.
