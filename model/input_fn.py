@@ -42,7 +42,7 @@ def input_fn(is_training, filenames, labels, batch_size=None):
                                                         batch_size=batch_size,
                                                         num_parallel_calls=8))
                    .repeat()
-                   .prefetch(batch_size)
+                   .prefetch(1)
                   )
     else:
         dataset = (tf.data.Dataset.from_tensor_slices((tf.constant(filenames), tf.constant(labels)))
