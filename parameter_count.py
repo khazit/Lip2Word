@@ -1,9 +1,9 @@
-'''
+"""
 Print the total number of parameters of a Tensorflow Estimator and the number
 of parameters in every layers.
 Slightly modified version of this source code :
 https://gist.github.com/dalgu90/a9952dfd372cbe1cdc529b204329e189
-'''
+"""
 
 import sys
 import tensorflow as tf
