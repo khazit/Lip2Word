@@ -40,6 +40,16 @@ http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.442.8617&rep=rep1&type=
  6. 2D convolution of 7x4
  7. fully connected layer
 
+## Inception
+Medium : https://towardsdatascience.com/a-simple-guide-to-the-versions-of-the-inception-network-7fc52b863202
+Paper : https://arxiv.org/pdf/1602.07261.pdf
+#### Architecture 
+ * Stem architecture : https://cdn-images-1.medium.com/max/1600/1*cYjhQ05zLXdHn363TsPrLQ.jpeg
+ * Modules : https://cdn-images-1.medium.com/max/640/1*KrBAIZjcrlXu6JPiPQj2vQ.jpeg
+ * Global architecture
+
+# Code optimization
+
 ## Data pipeline using tf.data to optimize performance
 https://www.tensorflow.org/guide/performance/datasets
 
