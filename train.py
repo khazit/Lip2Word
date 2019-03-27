@@ -37,8 +37,8 @@ if __name__ == '__main__' :
     val_filenames = [str(path) for path in val_pathlist]
     val_labels = [int(s.split("_")[1].split('/')[2]) for s in val_filenames]
     
-    print(train_filenames[:10])
-    print(train_labels[:10])
+    print(train_filenames[:5])
+    print(train_labels[:5])
  
     print("Done loading data")
     print("Data summary :\n\tTraining set size {}\n\tValidation set size {}".format(
