@@ -38,30 +38,31 @@ def cnn_model_fn(features, labels, mode):
                 activation=tf.nn.relu,
                 name="conv1",
                 reuse=tf.AUTO_REUSE))
-    # Pooling Layer #1 :
-    # 2x2, stride 2, on every frame.
-    pool1 = list()
-    for conv in conv1 :
-        pool1.append(
-            tf.layers.max_pooling2d(
-                inputs=conv,
-                pool_size=[2, 2],
-                strides=2,
-                name="pool1"))
     # Batch normalization on every frame
     batch_norm1 = list()
-    for pool in pool1 :
+    for conv in conv1 :
         batch_norm1.append(
             tf.layers.batch_normalization(
-                inputs=pool,
+                inputs=conv,
                 reuse=tf.AUTO_REUSE,
                 training=(mode == tf.estimator.ModeKeys.TRAIN),
                 name="batch_norm1"
             )
         )
+    # Pooling Layer #1 :
+    # 2x2, stride 2, on every frame.
+    pool1 = list()
+    for batch_norm in batch_norm1 :
+        pool1.append(
+            tf.layers.max_pooling2d(
+                inputs=batch_norm,
+                pool_size=[2, 2],
+                strides=2,
+                name="pool1"))
+
     # Concatenate tensors along time dimension
     layer1 = tf.concat(
-        values=batch_norm1,
+        values=pool1,
         axis=3,
         name="concat")
 
@@ -116,7 +117,7 @@ def cnn_model_fn(features, labels, mode):
 
     # Convolutional and Pooling Layers #5
     conv5 = tf.layers.conv2d(
-        inputs=conv4,
+        inputs=batch_norm4,
         filters=512,
         kernel_size=[3, 3],
         activation=tf.nn.relu,
