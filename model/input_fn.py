@@ -19,7 +19,9 @@ def import_image(filename, label):
     image_decoded = tf.image.decode_jpeg(image_string, channels=1)
     # Convert to range [0,1]
     image = tf.image.convert_image_dtype(image_decoded, tf.float32)
-    video = tf.reshape(image, shape=(64, 64, 29))
+    # video = tf.reshape(image, shape=(64, 64, 29))
+    video = [tf.slice(image, begin=[0, 0, 0], size=[64, 64, 1]) for i in range(30)]
+    video = tf.concat(video, axis=2)
     return video, label
 
 def input_fn(is_training, filenames, labels, batch_size=None):

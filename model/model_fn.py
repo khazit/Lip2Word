@@ -21,7 +21,7 @@ def cnn_model_fn(features, labels, mode):
     num_classes = 500
 
     # Input layer
-    input_layer = tf.reshape(features, [-1, 64, 64, num_frames])
+    # input_layer = tf.reshape(features, [-1, 64, 64, num_frames])
 
     # Convolutional Layer #1 :
     # on every frame separately , shared weights
@@ -30,14 +30,15 @@ def cnn_model_fn(features, labels, mode):
         conv1.append(
             tf.layers.conv2d(
                 inputs=tf.reshape(
-                    input_layer[:, :, :, i],
+                    features[:, :, :, i],
                     [-1, 64, 64, 1]),
                 filters=48,
                 kernel_size=[3, 3],
                 padding="valid",
                 activation=tf.nn.relu,
                 name="conv1",
-                reuse=tf.AUTO_REUSE))
+                reuse=tf.AUTO_REUSE)
+            )
     # Batch normalization on every frame
     batch_norm1 = list()
     for conv in conv1 :
@@ -46,8 +47,7 @@ def cnn_model_fn(features, labels, mode):
                 inputs=conv,
                 reuse=tf.AUTO_REUSE,
                 training=(mode == tf.estimator.ModeKeys.TRAIN),
-                name="batch_norm1"
-            )
+                name="batch_norm1")
         )
     # Pooling Layer #1 :
     # 2x2, stride 2, on every frame.
@@ -101,7 +101,7 @@ def cnn_model_fn(features, labels, mode):
     batch_norm3 = tf.layers.batch_normalization(
         inputs=conv3,
         training=(mode == tf.estimator.ModeKeys.TRAIN),
-        name="batch_norm3")   
+        name="batch_norm3")
 
     # Convolutional Layer #4
     conv4 = tf.layers.conv2d(
@@ -201,6 +201,13 @@ def cnn_model_fn(features, labels, mode):
     train_op = optimizer.minimize(
         loss=loss,
         global_step=global_step)
+
+    tf.summary.image(
+        tensor=tf.reshape(
+            features[:, :, :, 10],
+            [-1, 64, 64, 1]),
+        name="training_viz")
+
     return tf.estimator.EstimatorSpec(
         mode=mode,
         loss=loss,
