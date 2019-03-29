@@ -20,8 +20,11 @@ def cnn_model_fn(features, labels, mode):
     num_frames = 29
     num_classes = 500
 
-    # Input layer
-    # input_layer = tf.reshape(features, [-1, 64, 64, num_frames])
+    # tf.summary.image(
+    #     tensor=tf.reshape(
+    #         features[:, :, :, 1],
+    #         [-1, 64, 64, 1]),
+    #     name="viz")
 
     # Convolutional Layer #1 :
     # on every frame separately , shared weights
@@ -39,23 +42,14 @@ def cnn_model_fn(features, labels, mode):
                 name="conv1",
                 reuse=tf.AUTO_REUSE)
             )
-    # Batch normalization on every frame
-    batch_norm1 = list()
-    for conv in conv1 :
-        batch_norm1.append(
-            tf.layers.batch_normalization(
-                inputs=conv,
-                reuse=tf.AUTO_REUSE,
-                training=(mode == tf.estimator.ModeKeys.TRAIN),
-                name="batch_norm1")
-        )
+
     # Pooling Layer #1 :
     # 2x2, stride 2, on every frame.
     pool1 = list()
-    for batch_norm in batch_norm1 :
+    for conv in conv1 :
         pool1.append(
             tf.layers.max_pooling2d(
-                inputs=batch_norm,
+                inputs=conv,
                 pool_size=[2, 2],
                 strides=2,
                 name="pool1"))
@@ -81,12 +75,8 @@ def cnn_model_fn(features, labels, mode):
         activation=tf.nn.relu,
         kernel_size=[3, 3],
         name="conv2")
-    batch_norm2 = tf.layers.batch_normalization(
-            inputs=conv2,
-            training=(mode == tf.estimator.ModeKeys.TRAIN),
-            name="batch_norm2")
     pool2 = tf.layers.max_pooling2d(
-        inputs=batch_norm2,
+        inputs=conv2,
         pool_size=[2, 2],
         strides=2,
         name="pool2")
@@ -98,36 +88,24 @@ def cnn_model_fn(features, labels, mode):
         activation=tf.nn.relu,
         kernel_size=[3, 3],
         name="conv3")
-    batch_norm3 = tf.layers.batch_normalization(
-        inputs=conv3,
-        training=(mode == tf.estimator.ModeKeys.TRAIN),
-        name="batch_norm3")
 
     # Convolutional Layer #4
     conv4 = tf.layers.conv2d(
-        inputs = batch_norm3,
+        inputs = conv3,
         filters=512,
         activation=tf.nn.relu,
         kernel_size=[3, 3],
         name="conv4")
-    batch_norm4 = tf.layers.batch_normalization(
-        inputs=conv4,
-        training=(mode == tf.estimator.ModeKeys.TRAIN),
-        name="batch_norm4")
 
     # Convolutional and Pooling Layers #5
     conv5 = tf.layers.conv2d(
-        inputs=batch_norm4,
+        inputs=conv4,
         filters=512,
         kernel_size=[3, 3],
         activation=tf.nn.relu,
         name="conv5")
-    batch_norm5 = tf.layers.batch_normalization(
-        inputs=conv5,
-        training=(mode == tf.estimator.ModeKeys.TRAIN),
-        name="batch_norm5")
     pool5 = tf.layers.max_pooling2d(
-        inputs=batch_norm5,
+        inputs=conv5,
         pool_size=[2, 2],
         strides=2,
         name="pool5")
@@ -201,12 +179,6 @@ def cnn_model_fn(features, labels, mode):
     train_op = optimizer.minimize(
         loss=loss,
         global_step=global_step)
-
-    tf.summary.image(
-        tensor=tf.reshape(
-            features[:, :, :, 10],
-            [-1, 64, 64, 1]),
-        name="training_viz")
 
     return tf.estimator.EstimatorSpec(
         mode=mode,
