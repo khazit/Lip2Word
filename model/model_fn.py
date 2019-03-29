@@ -18,7 +18,7 @@ def cnn_model_fn(features, labels, mode):
     '''
     # Useful variables
     num_frames = 29
-    num_classes = 10
+    num_classes = 500
 
     # tf.summary.image(
     #     tensor=tf.reshape(
@@ -40,29 +40,26 @@ def cnn_model_fn(features, labels, mode):
                 padding="valid",
                 activation=tf.nn.relu,
                 name="conv1",
-                reuse=tf.AUTO_REUSE)
+                reuse=tf.AUTO_REUSE
+                )
             )
-
-    # Pooling Layer #1 :
-    # 2x2, stride 2, on every frame.
-    pool1 = list()
-    for conv in conv1 :
-        pool1.append(
-            tf.layers.max_pooling2d(
-                inputs=conv,
-                pool_size=[2, 2],
-                strides=2,
-                name="pool1"))
-
     # Concatenate tensors along time dimension
-    layer1 = tf.concat(
-        values=pool1,
+    conv1_concat = tf.concat(
+        values=conv1,
         axis=3,
         name="concat")
+    # Pooling Layer #1 :
+    # 2x2, stride 2, on every frame.
+    pool1 = tf.layers.max_pooling2d(
+        inputs=conv1_concat,
+        pool_size=[2, 2],
+        strides=2,
+        name="pool1")
+
 
     # Convolutional Layer to reduce dimension
     conv_dim = tf.layers.conv2d(
-        inputs=layer1,
+        inputs=pool1,
         filters=92,
         activation=tf.nn.relu,
         kernel_size=[1, 1],
@@ -165,12 +162,12 @@ def cnn_model_fn(features, labels, mode):
             eval_metric_ops=metrics)
 
     # Training stops here
-    starter_learning_rate = 0.01
+    starter_learning_rate = 0.005
     global_step = tf.train.get_global_step()
     learning_rate = tf.train.exponential_decay(starter_learning_rate,
                                                global_step,
-                                               10000,
-                                               0.76,
+                                               5000,
+                                               0.70,
                                                staircase=False)
     tf.summary.scalar('learning_rate', learning_rate)
     optimizer = tf.train.MomentumOptimizer(

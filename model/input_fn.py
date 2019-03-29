@@ -46,6 +46,6 @@ def input_fn(is_training, filenames, labels, batch_size=None):
     else:
         dataset = (tf.data.Dataset.from_tensor_slices((tf.constant(filenames), tf.constant(labels)))
                    .map(import_image, num_parallel_calls=8)
-                   .batch(500)
+                   .batch(100)
                   )
         return dataset
