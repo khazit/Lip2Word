@@ -18,7 +18,7 @@ def cnn_model_fn(features, labels, mode):
     '''
     # Useful variables
     num_frames = 29
-    num_classes = 500
+    num_classes = 10
 
     # tf.summary.image(
     #     tensor=tf.reshape(
