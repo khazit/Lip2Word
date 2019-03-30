@@ -1,6 +1,6 @@
 """
 Create the data pipeline to import the model inputs.
-Code inspired by Stanford's CS230 project code examples. 
+Code inspired by Stanford's CS230 project code examples.
 """
 
 import tensorflow as tf
@@ -17,9 +17,9 @@ def import_image(filename, label):
     '''
     image_string = tf.read_file(filename)
     image_decoded = tf.image.decode_jpeg(image_string, channels=1)
-    # Convert to range [0,1]
     image = tf.image.convert_image_dtype(image_decoded, tf.float32)
-    video = tf.reshape(image, shape=(64, 64, 29))
+    video = [tf.slice(image, begin=[i*64, 0, 0], size=[64, 64, 1]) for i in range(29)]
+    video = tf.concat(video, axis=2)
     return video, label
 
 def input_fn(is_training, filenames, labels, batch_size=None):
@@ -33,19 +33,19 @@ def input_fn(is_training, filenames, labels, batch_size=None):
         - batch_size: size of the batch
     '''
     num_samples = len(filenames)
-    import_fn = lambda f, l: import_image(f, l)
-    
+
     if is_training:
         dataset = (tf.data.Dataset.from_tensor_slices((tf.constant(filenames), tf.constant(labels)))
                    .shuffle(num_samples)
-                   .map(import_fn)
-                   .batch(batch_size)
                    .repeat()
+                   .map(import_image, num_parallel_calls=8)
+                   .batch(batch_size)
                    .prefetch(1)
                   )
+        return dataset.make_one_shot_iterator().get_next()
     else:
         dataset = (tf.data.Dataset.from_tensor_slices((tf.constant(filenames), tf.constant(labels)))
-                   .map(import_fn)
-                   .batch(len(filenames))
+                   .map(import_image, num_parallel_calls=8)
+                   .batch(100)
                   )
-    return dataset.make_one_shot_iterator().get_next() 
+        return dataset

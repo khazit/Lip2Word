@@ -8,8 +8,8 @@ import tensorflow as tf
 tf.logging.set_verbosity(tf.logging.INFO)
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--data_dir', 
-                    default='', 
+parser.add_argument('--data_dir',
+                    default='',
                     help="Directory with processed dataset")
 parser.add_argument('--n_steps',
                     default=1,
@@ -21,7 +21,7 @@ parser.add_argument('--model_dir',
 
 if __name__ == '__main__' :
     args = parser.parse_args()
-    
+
     # Load the training dataset
     print("Loading dataset from "+args.data_dir)
     train_dir = os.path.join(args.data_dir, "train")
@@ -30,13 +30,15 @@ if __name__ == '__main__' :
     assert os.path.isdir(val_dir), "No validation directory found"
     # Training data
     train_pathlist = Path(train_dir).glob("*.jpg")
-    train_filenames = [str(path) for path in train_pathlist] # doesn't generalize
-    train_labels = [int(s.split("_")[1][-1]) for s in train_filenames]
+    train_filenames = [str(path) for path in train_pathlist]
+#    train_filenames = [s for s in train_filenames if int(s.split("_")[1].split('/')[2]) < 100] ## REMOVE AFTER TESTS
+    train_labels = [int(s.split("_")[1].split('/')[2]) for s in train_filenames]
     # Validation data
     val_pathlist = Path(val_dir).glob("*.jpg")
-    val_filenames = [str(path) for path in val_pathlist] # doesn't generalize
-    val_labels = [int(s.split("_")[1][-1]) for s in val_filenames]
-    
+    val_filenames = [str(path) for path in val_pathlist]
+#    val_filenames = [s for s in val_filenames if int(s.split("_")[1].split('/')[2]) < 100] ## REMOVE AFTER TESTS
+    val_labels = [int(s.split("_")[1].split('/')[2]) for s in val_filenames]
+
     print("Done loading data")
     print("Data summary :\n\tTraining set size {}\n\tValidation set size {}".format(
         len(train_filenames),
@@ -50,16 +52,16 @@ if __name__ == '__main__' :
 
     print("Training classifier for {} steps".format(args.n_steps))
     n_steps = int(args.n_steps)
-    for i in range(n_steps//1000):
-        cnn_classifier.train(
-            input_fn=lambda:input_fn(True,
-                                     train_filenames,
-                                     train_labels,
-                                     32),
-            steps=1000)
-        cnn_classifier.evaluate(
-            input_fn=lambda:input_fn(False,
-                                     val_filenames,
-                                     val_labels))
+    cnn_classifier.train(
+        input_fn=lambda:input_fn(True,
+                                 train_filenames,
+                                 train_labels,
+                                 32),
+        steps=n_steps)
+    val_results = cnn_classifier.evaluate(
+        input_fn=lambda:input_fn(False,
+                                 val_filenames,
+                                 val_labels,
+                                 None))
+    print("Results : \n{}".format(val_results))
     print("Done training")
-    
