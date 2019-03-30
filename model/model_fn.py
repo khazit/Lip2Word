@@ -20,8 +20,11 @@ def cnn_model_fn(features, labels, mode):
     num_frames = 29
     num_classes = 500
 
-    # Input layer
-    # input_layer = tf.reshape(features, [-1, 64, 64, num_frames])
+    # tf.summary.image(
+    #     tensor=tf.reshape(
+    #         features[:, :, :, 1],
+    #         [-1, 64, 64, 1]),
+    #     name="viz")
 
     # Convolutional Layer #1 :
     # on every frame separately , shared weights
@@ -37,38 +40,26 @@ def cnn_model_fn(features, labels, mode):
                 padding="valid",
                 activation=tf.nn.relu,
                 name="conv1",
-                reuse=tf.AUTO_REUSE)
+                reuse=tf.AUTO_REUSE
+                )
             )
-    # Batch normalization on every frame
-    batch_norm1 = list()
-    for conv in conv1 :
-        batch_norm1.append(
-            tf.layers.batch_normalization(
-                inputs=conv,
-                reuse=tf.AUTO_REUSE,
-                training=(mode == tf.estimator.ModeKeys.TRAIN),
-                name="batch_norm1")
-        )
-    # Pooling Layer #1 :
-    # 2x2, stride 2, on every frame.
-    pool1 = list()
-    for batch_norm in batch_norm1 :
-        pool1.append(
-            tf.layers.max_pooling2d(
-                inputs=batch_norm,
-                pool_size=[2, 2],
-                strides=2,
-                name="pool1"))
-
     # Concatenate tensors along time dimension
-    layer1 = tf.concat(
-        values=pool1,
+    conv1_concat = tf.concat(
+        values=conv1,
         axis=3,
         name="concat")
+    # Pooling Layer #1 :
+    # 2x2, stride 2, on every frame.
+    pool1 = tf.layers.max_pooling2d(
+        inputs=conv1_concat,
+        pool_size=[2, 2],
+        strides=2,
+        name="pool1")
+
 
     # Convolutional Layer to reduce dimension
     conv_dim = tf.layers.conv2d(
-        inputs=layer1,
+        inputs=pool1,
         filters=92,
         activation=tf.nn.relu,
         kernel_size=[1, 1],
@@ -81,12 +72,8 @@ def cnn_model_fn(features, labels, mode):
         activation=tf.nn.relu,
         kernel_size=[3, 3],
         name="conv2")
-    batch_norm2 = tf.layers.batch_normalization(
-            inputs=conv2,
-            training=(mode == tf.estimator.ModeKeys.TRAIN),
-            name="batch_norm2")
     pool2 = tf.layers.max_pooling2d(
-        inputs=batch_norm2,
+        inputs=conv2,
         pool_size=[2, 2],
         strides=2,
         name="pool2")
@@ -98,36 +85,24 @@ def cnn_model_fn(features, labels, mode):
         activation=tf.nn.relu,
         kernel_size=[3, 3],
         name="conv3")
-    batch_norm3 = tf.layers.batch_normalization(
-        inputs=conv3,
-        training=(mode == tf.estimator.ModeKeys.TRAIN),
-        name="batch_norm3")
 
     # Convolutional Layer #4
     conv4 = tf.layers.conv2d(
-        inputs = batch_norm3,
+        inputs = conv3,
         filters=512,
         activation=tf.nn.relu,
         kernel_size=[3, 3],
         name="conv4")
-    batch_norm4 = tf.layers.batch_normalization(
-        inputs=conv4,
-        training=(mode == tf.estimator.ModeKeys.TRAIN),
-        name="batch_norm4")
 
     # Convolutional and Pooling Layers #5
     conv5 = tf.layers.conv2d(
-        inputs=batch_norm4,
+        inputs=conv4,
         filters=512,
         kernel_size=[3, 3],
         activation=tf.nn.relu,
         name="conv5")
-    batch_norm5 = tf.layers.batch_normalization(
-        inputs=conv5,
-        training=(mode == tf.estimator.ModeKeys.TRAIN),
-        name="batch_norm5")
     pool5 = tf.layers.max_pooling2d(
-        inputs=batch_norm5,
+        inputs=conv5,
         pool_size=[2, 2],
         strides=2,
         name="pool5")
@@ -187,12 +162,12 @@ def cnn_model_fn(features, labels, mode):
             eval_metric_ops=metrics)
 
     # Training stops here
-    starter_learning_rate = 0.01
+    starter_learning_rate = 0.005
     global_step = tf.train.get_global_step()
     learning_rate = tf.train.exponential_decay(starter_learning_rate,
                                                global_step,
-                                               10000,
-                                               0.76,
+                                               5000,
+                                               0.70,
                                                staircase=False)
     tf.summary.scalar('learning_rate', learning_rate)
     optimizer = tf.train.MomentumOptimizer(
@@ -201,12 +176,6 @@ def cnn_model_fn(features, labels, mode):
     train_op = optimizer.minimize(
         loss=loss,
         global_step=global_step)
-
-    tf.summary.image(
-        tensor=tf.reshape(
-            features[:, :, :, 10],
-            [-1, 64, 64, 1]),
-        name="training_viz")
 
     return tf.estimator.EstimatorSpec(
         mode=mode,

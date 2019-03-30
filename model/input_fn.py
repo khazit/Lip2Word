@@ -17,10 +17,8 @@ def import_image(filename, label):
     '''
     image_string = tf.read_file(filename)
     image_decoded = tf.image.decode_jpeg(image_string, channels=1)
-    # Convert to range [0,1]
     image = tf.image.convert_image_dtype(image_decoded, tf.float32)
-    # video = tf.reshape(image, shape=(64, 64, 29))
-    video = [tf.slice(image, begin=[0, 0, 0], size=[64, 64, 1]) for i in range(30)]
+    video = [tf.slice(image, begin=[i*64, 0, 0], size=[64, 64, 1]) for i in range(29)]
     video = tf.concat(video, axis=2)
     return video, label
 
@@ -35,21 +33,19 @@ def input_fn(is_training, filenames, labels, batch_size=None):
         - batch_size: size of the batch
     '''
     num_samples = len(filenames)
-    import_fn = lambda f, l: import_image(f, l)
 
     if is_training:
         dataset = (tf.data.Dataset.from_tensor_slices((tf.constant(filenames), tf.constant(labels)))
                    .shuffle(num_samples)
-                   .apply(tf.contrib.data.map_and_batch(map_func=import_image,
-                                                        batch_size=batch_size,
-                                                        num_parallel_calls=8))
                    .repeat()
+                   .map(import_image, num_parallel_calls=8)
+                   .batch(batch_size)
                    .prefetch(1)
                   )
+        return dataset.make_one_shot_iterator().get_next()
     else:
         dataset = (tf.data.Dataset.from_tensor_slices((tf.constant(filenames), tf.constant(labels)))
-                   .apply(tf.contrib.data.map_and_batch(map_func=import_image,
-                                                        batch_size=500,
-                                                        num_parallel_calls=8))
+                   .map(import_image, num_parallel_calls=8)
+                   .batch(100)
                   )
-    return dataset.make_one_shot_iterator().get_next()
+        return dataset
