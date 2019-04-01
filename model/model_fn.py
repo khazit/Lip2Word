@@ -162,12 +162,12 @@ def cnn_model_fn(features, labels, mode):
             eval_metric_ops=metrics)
 
     # Training stops here
-    starter_learning_rate = 0.005
+    starter_learning_rate = 0.002
     global_step = tf.train.get_global_step()
     learning_rate = tf.train.exponential_decay(starter_learning_rate,
                                                global_step,
-                                               5000,
-                                               0.70,
+                                               20000,
+                                               0.79,
                                                staircase=False)
     tf.summary.scalar('learning_rate', learning_rate)
     optimizer = tf.train.MomentumOptimizer(

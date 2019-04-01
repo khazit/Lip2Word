@@ -52,16 +52,17 @@ if __name__ == '__main__' :
 
     print("Training classifier for {} steps".format(args.n_steps))
     n_steps = int(args.n_steps)
-    cnn_classifier.train(
-        input_fn=lambda:input_fn(True,
-                                 train_filenames,
-                                 train_labels,
-                                 32),
-        steps=n_steps)
-    val_results = cnn_classifier.evaluate(
-        input_fn=lambda:input_fn(False,
-                                 val_filenames,
-                                 val_labels,
-                                 None))
+    for i in range(n_steps // 20000) :
+        cnn_classifier.train(
+            input_fn=lambda:input_fn(True,
+                                     train_filenames,
+                                     train_labels,
+                                     32),
+            steps=20000)
+        val_results = cnn_classifier.evaluate(
+            input_fn=lambda:input_fn(False,
+                                     val_filenames,
+                                     val_labels,
+                                     None))
     print("Results : \n{}".format(val_results))
     print("Done training")
