@@ -48,6 +48,12 @@ Paper : https://arxiv.org/pdf/1602.07261.pdf
  * Modules : https://cdn-images-1.medium.com/max/640/1*KrBAIZjcrlXu6JPiPQj2vQ.jpeg
  * Global architecture
 
+## Batch Normalization
+https://fr.coursera.org/lecture/deep-neural-network/normalizing-activations-in-a-network-4ptp2
+ * Normalize values inside a NN to speed up the learning. 
+ * We normalize the values before the activation function. It is done more often. Recommended by Andrew Ng.
+ * Two trainable parameters, Gamma and Beta to avoid having a mean=0 variance=1 all the time
+
 # Code optimization
 
 ## Data pipeline using tf.data to optimize performance
