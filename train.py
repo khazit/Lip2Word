@@ -31,12 +31,12 @@ if __name__ == '__main__' :
     # Training data
     train_pathlist = Path(train_dir).glob("*.jpg")
     train_filenames = [str(path) for path in train_pathlist]
-#    train_filenames = [s for s in train_filenames if int(s.split("_")[1].split('/')[2]) < 100] ## REMOVE AFTER TESTS
+#    train_filenames = [s for s in train_filenames if int(s.split("_")[1].split('/')[2]) < 10] ## REMOVE AFTER TESTS
     train_labels = [int(s.split("_")[1].split('/')[2]) for s in train_filenames]
     # Validation data
     val_pathlist = Path(val_dir).glob("*.jpg")
     val_filenames = [str(path) for path in val_pathlist]
-#    val_filenames = [s for s in val_filenames if int(s.split("_")[1].split('/')[2]) < 100] ## REMOVE AFTER TESTS
+#    val_filenames = [s for s in val_filenames if int(s.split("_")[1].split('/')[2]) < 10] ## REMOVE AFTER TESTS
     val_labels = [int(s.split("_")[1].split('/')[2]) for s in val_filenames]
 
     print("Done loading data")
@@ -52,6 +52,19 @@ if __name__ == '__main__' :
 
     print("Training classifier for {} steps".format(args.n_steps))
     n_steps = int(args.n_steps)
+#    cnn_classifier.train(
+#            input_fn=lambda:input_fn(True,
+#                                     train_filenames,
+#                                     train_labels,
+#                                     32),
+#            steps=n_steps)
+#    val_results = cnn_classifier.evaluate(
+#            input_fn=lambda:input_fn(False,
+#                                     val_filenames,
+#                                     val_labels,
+#                                     None))
+#    print("Results : \n{}".format(val_results))
+
     for i in range(n_steps // 20000) :
         cnn_classifier.train(
             input_fn=lambda:input_fn(True,
