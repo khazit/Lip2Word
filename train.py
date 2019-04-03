@@ -64,5 +64,5 @@ if __name__ == '__main__' :
                                      val_filenames,
                                      val_labels,
                                      None))
-    print("Results : \n{}".format(val_results))
+    # print("Results : \n{}".format(val_results))
     print("Done training")

@@ -4,6 +4,15 @@ Define the model function.
 
 import tensorflow as tf
 
+def batch_norm(inputs, is_training) :
+    '''
+
+    '''
+    inputs =  tf.layers.batch_normalization(
+        inputs=inputs,
+        training=is_training)
+    return tf.nn.relu(inputs)
+
 def cnn_model_fn(features, labels, mode):
     '''
     Model function for the CNN (Multiple Towers)
@@ -19,6 +28,7 @@ def cnn_model_fn(features, labels, mode):
     # Useful variables
     num_frames = 29
     num_classes = 500
+    is_training = (mode == tf.estimator.ModeKeys.TRAIN)
 
     # tf.summary.image(
     #     tensor=tf.reshape(
@@ -41,8 +51,8 @@ def cnn_model_fn(features, labels, mode):
                 activation=tf.nn.relu,
                 name="conv1",
                 reuse=tf.AUTO_REUSE
-                )
             )
+        )
     # Concatenate tensors along time dimension
     conv1_concat = tf.concat(
         values=conv1,
@@ -56,22 +66,25 @@ def cnn_model_fn(features, labels, mode):
         strides=2,
         name="pool1")
 
-
     # Convolutional Layer to reduce dimension
     conv_dim = tf.layers.conv2d(
         inputs=pool1,
         filters=92,
-        activation=tf.nn.relu,
         kernel_size=[1, 1],
         name="conv_dim")
+    conv_dim = batch_norm(
+        inputs=conv_dim,
+        is_training=is_training)
 
     # Convolutional and Pooling Layers #2
     conv2 = tf.layers.conv2d(
         inputs=conv_dim,
         filters=256,
-        activation=tf.nn.relu,
         kernel_size=[3, 3],
         name="conv2")
+    conv2 = batch_norm(
+        inputs=conv2,
+        is_training=is_training)
     pool2 = tf.layers.max_pooling2d(
         inputs=conv2,
         pool_size=[2, 2],
@@ -82,25 +95,31 @@ def cnn_model_fn(features, labels, mode):
     conv3 = tf.layers.conv2d(
         inputs = pool2,
         filters=512,
-        activation=tf.nn.relu,
         kernel_size=[3, 3],
         name="conv3")
+    conv3 = batch_norm(
+        inputs=conv3,
+        is_training=is_training)
 
     # Convolutional Layer #4
     conv4 = tf.layers.conv2d(
         inputs = conv3,
         filters=512,
-        activation=tf.nn.relu,
         kernel_size=[3, 3],
         name="conv4")
+    conv4 = batch_norm(
+        inputs=conv4,
+        is_training=is_training)
 
     # Convolutional and Pooling Layers #5
     conv5 = tf.layers.conv2d(
         inputs=conv4,
         filters=512,
         kernel_size=[3, 3],
-        activation=tf.nn.relu,
         name="conv5")
+    conv5 = batch_norm(
+        inputs=conv5,
+        is_training=is_training)
     pool5 = tf.layers.max_pooling2d(
         inputs=conv5,
         pool_size=[2, 2],
@@ -116,8 +135,10 @@ def cnn_model_fn(features, labels, mode):
     dense = tf.layers.dense(
         inputs=pool5_flat,
         units=4096,
-        activation=tf.nn.relu,
         name="dense")
+    dense = batch_norm(
+        inputs=dense,
+        is_training=is_training)
 
     # IF OVERFITTING, USE DROPOUT HERE
 
