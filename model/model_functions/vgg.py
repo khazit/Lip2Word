@@ -1,24 +1,7 @@
-"""
-Define the model function.
-"""
-
 import tensorflow as tf
+from utils import batch_norm
 
-def batch_norm(inputs, is_training) :
-    '''
-    Utility function. BatchNorm + ReLu
-    Args :
-        - inputs : a tensor of inputs
-        - is_training : a bool
-    Return :
-        - Tensor after BatchNorm + ReLu. Same shape as inputs
-    '''
-    inputs =  tf.layers.batch_normalization(
-        inputs=inputs,
-        training=is_training)
-    return tf.nn.relu(inputs)
-
-def cnn_model_fn(features, labels, mode):
+def vgg_model_fn(features, labels, mode):
     '''
     Model function for the CNN (Multiple Towers)
     Code inspired by :
@@ -33,11 +16,11 @@ def cnn_model_fn(features, labels, mode):
     # Useful variables
     num_frames = 29
     num_classes = 500
-    if (mode == tf.estimator.ModeKeys.TRAIN) : 
+    if (mode == tf.estimator.ModeKeys.TRAIN) :
         is_training = tf.constant(True, dtype=tf.bool)
     else :
         is_training = tf.constant(False, dtype=tf.bool)
-    
+
     # tf.summary.image(
     #     tensor=tf.reshape(
     #         features[:, :, :, 1],
@@ -213,7 +196,7 @@ def cnn_model_fn(features, labels, mode):
     # Add the update ops for the moving_mean and moving_variance of batchnorm
     update_ops = tf.get_collection(tf.GraphKeys.UPDATE_OPS)
     train_op = tf.group([train_op, update_ops])
-    
+
     return tf.estimator.EstimatorSpec(
         mode=mode,
         loss=loss,

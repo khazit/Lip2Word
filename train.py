@@ -1,4 +1,4 @@
-from model.model_fn import cnn_model_fn
+from model.model_functions.vgg import vgg_model_fn
 from model.input_fn import input_fn
 import argparse
 import os
@@ -47,35 +47,35 @@ if __name__ == '__main__' :
     # Create the estimator
     print("Creating estimator from/to " + os.path.join("experiments", args.model_dir))
     cnn_classifier = tf.estimator.Estimator(
-        model_fn=cnn_model_fn,
+        model_fn=vgg_model_fn,
         model_dir=os.path.join("experiments", args.model_dir))
 
     print("Training classifier for {} steps".format(args.n_steps))
     n_steps = int(args.n_steps)
-#    cnn_classifier.train(
-#            input_fn=lambda:input_fn(True,
-#                                     train_filenames,
-#                                     train_labels,
-#                                     32),
-#            steps=n_steps)
-#    val_results = cnn_classifier.evaluate(
-#            input_fn=lambda:input_fn(False,
-#                                     val_filenames,
-#                                     val_labels,
-#                                     None))
-#    print("Results : \n{}".format(val_results))
-
-    for i in range(n_steps // 20000) :
-        cnn_classifier.train(
+    cnn_classifier.train(
             input_fn=lambda:input_fn(True,
-                                     train_filenames,
-                                     train_labels,
-                                     32),
-            steps=20000)
-        val_results = cnn_classifier.evaluate(
+                                    train_filenames,
+                                    train_labels,
+                                    32),
+            steps=n_steps)
+    val_results = cnn_classifier.evaluate(
             input_fn=lambda:input_fn(False,
-                                     val_filenames,
-                                     val_labels,
-                                     None))
+                                    val_filenames,
+                                    val_labels,
+                                    None))
+   print("Results : \n{}".format(val_results))
+
+    # for i in range(n_steps // 20000) :
+    #     cnn_classifier.train(
+    #         input_fn=lambda:input_fn(True,
+    #                                  train_filenames,
+    #                                  train_labels,
+    #                                  32),
+    #         steps=20000)
+    #     val_results = cnn_classifier.evaluate(
+    #         input_fn=lambda:input_fn(False,
+    #                                  val_filenames,
+    #                                  val_labels,
+    #                                  None))
     print("Results : \n{}".format(val_results))
     print("Done training")

@@ -1,4 +1,4 @@
-from model.model_fn import cnn_model_fn
+from model.model_functions.vgg import vgg_model_fn
 from model.input_fn import input_fn
 import argparse
 import os
@@ -8,8 +8,8 @@ import tensorflow as tf
 tf.logging.set_verbosity(tf.logging.INFO)
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--data_dir', 
-                    default='', 
+parser.add_argument('--data_dir',
+                    default='',
                     help="Directory with processed dataset")
 parser.add_argument('--model_dir',
                     default=None,
@@ -21,7 +21,7 @@ parser.add_argument('--data_set',
 
 if __name__ == '__main__' :
     args = parser.parse_args()
-    
+
     # Load the dataset
     print("Loading dataset from " + args.data_dir + args.data_set)
     test_dir = os.path.join(args.data_dir, args.data_set)
@@ -30,7 +30,7 @@ if __name__ == '__main__' :
     test_pathlist = Path(test_dir).glob("*.jpg")
     test_filenames = [str(path) for path in test_pathlist] # doesn't generalize
     test_labels = [int(s.split("_")[1].split('/')[2]) for s in test_filenames]
-    
+
     print(test_filenames[:3])
     print(test_labels[:3])
     print("Done loading data")
@@ -40,12 +40,12 @@ if __name__ == '__main__' :
     # Create the estimator
     print("Creating estimator from/to " + os.path.join("experiments", args.model_dir))
     cnn_classifier = tf.estimator.Estimator(
-        model_fn=cnn_model_fn,
+        model_fn=vgg_model_fn,
         model_dir=os.path.join("experiments", args.model_dir))
-    
+
     print("Evaluating model")
     test_results = cnn_classifier.evaluate(
         input_fn=lambda:input_fn(False,
                                  test_filenames,
-                                 test_labels))    
+                                 test_labels))
     print("Results : \n{}".format(test_results))
