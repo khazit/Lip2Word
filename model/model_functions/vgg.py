@@ -1,5 +1,5 @@
 import tensorflow as tf
-from utils import batch_norm
+from model.model_functions.utils import batch_norm
 
 def vgg_model_fn(features, labels, mode):
     '''

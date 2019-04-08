@@ -63,7 +63,7 @@ if __name__ == '__main__' :
                                     val_filenames,
                                     val_labels,
                                     None))
-   print("Results : \n{}".format(val_results))
+#   print("Results : \n{}".format(val_results))
 
     # for i in range(n_steps // 20000) :
     #     cnn_classifier.train(
