@@ -28,15 +28,17 @@ if __name__ == '__main__' :
     val_dir = os.path.join(args.data_dir, "val")
     assert os.path.isdir(train_dir), "No training directory found"
     assert os.path.isdir(val_dir), "No validation directory found"
+
     # Training data
     train_pathlist = Path(train_dir).glob("*.jpg")
     train_filenames = [str(path) for path in train_pathlist]
-#    train_filenames = [s for s in train_filenames if int(s.split("_")[1].split('/')[2]) < 10] ## REMOVE AFTER TESTS
+    # train_filenames = [s for s in train_filenames if int(s.split("_")[1].split('/')[2]) < 10] ## REMOVE AFTER TESTS
     train_labels = [int(s.split("_")[1].split('/')[2]) for s in train_filenames]
+
     # Validation data
     val_pathlist = Path(val_dir).glob("*.jpg")
     val_filenames = [str(path) for path in val_pathlist]
-#    val_filenames = [s for s in val_filenames if int(s.split("_")[1].split('/')[2]) < 10] ## REMOVE AFTER TESTS
+    # val_filenames = [s for s in val_filenames if int(s.split("_")[1].split('/')[2]) < 10] ## REMOVE AFTER TESTS
     val_labels = [int(s.split("_")[1].split('/')[2]) for s in val_filenames]
 
     print("Done loading data")
@@ -61,9 +63,7 @@ if __name__ == '__main__' :
     val_results = cnn_classifier.evaluate(
             input_fn=lambda:input_fn(False,
                                     val_filenames,
-                                    val_labels,
-                                    None))
-#   print("Results : \n{}".format(val_results))
+                                    val_labels))
 
     # for i in range(n_steps // 20000) :
     #     cnn_classifier.train(
@@ -77,5 +77,6 @@ if __name__ == '__main__' :
     #                                  val_filenames,
     #                                  val_labels,
     #                                  None))
+
     print("Results : \n{}".format(val_results))
     print("Done training")
