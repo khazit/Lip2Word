@@ -2,17 +2,16 @@ import tensorflow as tf
 from model.model_fn.utils import batch_norm
 
 def vgg_model_fn(features, labels, mode):
-    '''
+    """
     Model function for the CNN (Multiple Towers)
-    Code inspired by :
-        https://www.tensorflow.org/tutorials/estimators/cnn
+    Code inspired by https://www.tensorflow.org/tutorials/estimators/cnn
     Args :
         - features: a dict of the features
         - labels: numpy array containing the labels
         - mode: PREDICT, TRAIN or EVAL
     Returns :
         - Custom Estimator
-    '''
+    """
     # Useful variables
     num_frames = 29
     num_classes = 500
@@ -20,12 +19,6 @@ def vgg_model_fn(features, labels, mode):
         is_training = tf.constant(True, dtype=tf.bool)
     else :
         is_training = tf.constant(False, dtype=tf.bool)
-
-    # tf.summary.image(
-    #     tensor=tf.reshape(
-    #         features[:, :, :, 1],
-    #         [-1, 64, 64, 1]),
-    #     name="viz")
 
     # Convolutional Layer #1 :
     # on every frame separately , shared weights
@@ -35,7 +28,8 @@ def vgg_model_fn(features, labels, mode):
             tf.layers.conv2d(
                 inputs=tf.reshape(
                     features[:, :, :, i],
-                    [-1, 64, 64, 1]),
+                    [-1, 64, 64, 1]
+                ),
                 filters=48,
                 kernel_size=[3, 3],
                 padding="valid",
@@ -48,88 +42,105 @@ def vgg_model_fn(features, labels, mode):
     conv1_concat = tf.concat(
         values=conv1,
         axis=3,
-        name="concat")
+        name="concat"
+    )
     # Pooling Layer #1 :
-    # 2x2, stride 2, on every frame.
     pool1 = tf.layers.max_pooling2d(
         inputs=conv1_concat,
         pool_size=[2, 2],
         strides=2,
-        name="pool1")
+        name="pool1"
+    )
 
     # Convolutional Layer to reduce dimension
     conv_dim = tf.layers.conv2d(
         inputs=pool1,
         filters=92,
         kernel_size=[1, 1],
-        name="conv_dim")
+        name="conv_dim"
+    )
     conv_dim = batch_norm(
         inputs=conv_dim,
-        is_training=is_training)
+        is_training=is_training
+    )
 
     # Convolutional and Pooling Layers #2
     conv2 = tf.layers.conv2d(
         inputs=conv_dim,
         filters=256,
         kernel_size=[3, 3],
-        name="conv2")
+        name="conv2"
+    )
     conv2 = batch_norm(
         inputs=conv2,
-        is_training=is_training)
+        is_training=is_training
+    )
     pool2 = tf.layers.max_pooling2d(
         inputs=conv2,
         pool_size=[2, 2],
         strides=2,
-        name="pool2")
+        name="pool2"
+    )
 
     # Convolutional Layer #3
     conv3 = tf.layers.conv2d(
         inputs = pool2,
         filters=512,
         kernel_size=[3, 3],
-        name="conv3")
+        name="conv3"
+    )
     conv3 = batch_norm(
         inputs=conv3,
-        is_training=is_training)
+        is_training=is_training
+    )
 
     # Convolutional Layer #4
     conv4 = tf.layers.conv2d(
         inputs = conv3,
         filters=512,
         kernel_size=[3, 3],
-        name="conv4")
+        name="conv4"
+    )
     conv4 = batch_norm(
         inputs=conv4,
-        is_training=is_training)
+        is_training=is_training
+    )
 
     # Convolutional and Pooling Layers #5
     conv5 = tf.layers.conv2d(
         inputs=conv4,
         filters=512,
         kernel_size=[3, 3],
-        name="conv5")
+        name="conv5"
+    )
     conv5 = batch_norm(
         inputs=conv5,
-        is_training=is_training)
+        is_training=is_training
+    )
     pool5 = tf.layers.max_pooling2d(
         inputs=conv5,
         pool_size=[2, 2],
         strides=2,
-        name="pool5")
+        name="pool5"
+    )
 
     # Flatten the feature map
-    pool5_flat = tf.reshape(pool5,
-                            [-1, 8192],
-                            name="pool5_flat")
+    pool5_flat = tf.reshape(
+        pool5,
+        [-1, 8192],
+        name="pool5_flat"
+    )
 
     # Dense Layer
     dense = tf.layers.dense(
         inputs=pool5_flat,
         units=4096,
-        name="dense")
+        name="dense"
+    )
     dense = batch_norm(
         inputs=dense,
-        is_training=is_training)
+        is_training=is_training
+    )
 
     # IF OVERFITTING, USE DROPOUT HERE
 
@@ -137,39 +148,70 @@ def vgg_model_fn(features, labels, mode):
     logits = tf.layers.dense(
         inputs=dense,
         units=num_classes,
-        name="logits")
+        name="logits"
+    )
 
     # Generate predictions
     predictions = {
-        "classes": tf.argmax(input=logits,
-                             axis=1,
-                             name="argmax"),
-        "probabilities": tf.nn.softmax(logits=logits,
-                                       name="softmax")}
+        "classes": tf.argmax(
+            input=logits,
+            axis=1,
+            name="argmax"),
+        "probabilities": tf.nn.softmax(
+            logits=logits,
+            name="softmax")
+    }
 
     # Prediction stops here
     if mode == tf.estimator.ModeKeys.PREDICT :
-        return tf.estimator.EstimatorSpec(mode=mode,
-                                          predictions=predictions)
+        return tf.estimator.EstimatorSpec(
+            mode=mode,
+            predictions=predictions
+    )
 
     # Calculate loss
     loss = tf.losses.sparse_softmax_cross_entropy(
         labels=labels,
-        logits=logits)
+        logits=logits
+    )
 
-    # Evaluation metrics
-    accuracy = tf.metrics.accuracy(labels=labels,
-                                   predictions=predictions["classes"],
-                                   name='acc_op')
-    metrics = {'accuracy': accuracy}
+    # Compute evaluation metrics
+    accuracy = tf.metrics.accuracy(
+        labels=labels,
+        predictions=predictions["classes"],
+        name='acc_op'
+    )
+    topk_accuracy = tf.metrics.mean(
+        tf.math.in_top_k(
+            predictions=logits,
+            targets=labels,
+            k=3
+        )
+    )
+    metrics = {
+        'accuracy': accuracy,
+        'topk_accuracy': topk_accuracy
+    }
+
+    # Display stuff on Tensorboard
     tf.summary.scalar('accuracy', accuracy[1])
+    tf.summary.scalar('topk_accuracy', topk_accuracy[1])
     tf.summary.scalar('loss', loss)
+    # Uncomment to display image inputs on Tensorboard
+    # tf.summary.image(
+    #     tensor=tf.reshape(
+    #         features[:, :, :, 1],
+    #         [-1, 64, 64, 1]),
+    #     name="viz")
 
     # Logging hook
     hook = tf.train.LoggingTensorHook(
-            {"accuracy": accuracy[0]},
-            every_n_iter=100)
-
+        tensors = {
+            "accuracy": accuracy[0],
+            "topk_accuracy": topk_accuracy[0]
+        },
+        every_n_iter=100
+    )
 
     # Evaluation stops here
     if mode == tf.estimator.ModeKeys.EVAL :
@@ -177,22 +219,33 @@ def vgg_model_fn(features, labels, mode):
             mode=mode,
             loss=loss,
             eval_metric_ops=metrics,
-            evaluation_hooks=[hook])
+            evaluation_hooks=[hook]
+        )
 
+    # Learning rate
     starter_learning_rate = 0.002
     global_step = tf.train.get_global_step()
-    learning_rate = tf.train.exponential_decay(starter_learning_rate,
-                                               global_step,
-                                               20000,
-                                               0.79,
-                                               staircase=False)
+    learning_rate = tf.train.exponential_decay(
+        starter_learning_rate,
+        global_step,
+        20000,
+        0.79,
+        staircase=False
+    )
+
+    # Display more stuff on Tensorboard (training related)
     tf.summary.scalar('learning_rate', learning_rate)
+
+    # Optimizer specifications
     optimizer = tf.train.MomentumOptimizer(
         learning_rate=learning_rate,
-        momentum=0.9)
+        momentum=0.9
+    )
     train_op = optimizer.minimize(
         loss=loss,
-        global_step=global_step)
+        global_step=global_step
+    )
+
     # Add the update ops for the moving_mean and moving_variance of batchnorm
     update_ops = tf.get_collection(tf.GraphKeys.UPDATE_OPS)
     train_op = tf.group([train_op, update_ops])
@@ -201,4 +254,5 @@ def vgg_model_fn(features, labels, mode):
         mode=mode,
         loss=loss,
         train_op=train_op,
-        training_hooks=[hook])
+        training_hooks=[hook]
+    )
