@@ -1,3 +1,7 @@
+"""
+Describe the training.
+"""
+
 from model.model_fn.vgg import vgg_model_fn
 from model.input_fn import input_fn
 import argparse
@@ -10,23 +14,35 @@ tf.logging.set_verbosity(tf.logging.INFO)
 parser = argparse.ArgumentParser()
 parser.add_argument('--data_dir',
                     default='',
-                    help="Directory with processed dataset")
-parser.add_argument('--n_steps',
-                    default=1,
-                    help="Number of steps")
+                    help="Directory with processed dataset"
+)
 parser.add_argument('--model_dir',
                     default=None,
-                    help="Model directory")
+                    help="Model directory"
+)
+parser.add_argument('--n_steps',
+                    default=0,
+                    help="Number of steps"
+)
+parser.add_argument('--n_epochs',
+                    default=0,
+                    help="Number of epochs"
+)
 
 
 if __name__ == '__main__' :
+    # Parse arguments
     args = parser.parse_args()
 
-    # Load the training dataset
+    # Useful variable
+    n_steps = int(args.n_steps)
+    n_epochs = int(args.n_epochs)
+
+    # Check if dataset exists
     print("Loading dataset from "+args.data_dir)
     train_dir = os.path.join(args.data_dir, "train")
-    val_dir = os.path.join(args.data_dir, "val")
     assert os.path.isdir(train_dir), "No training directory found"
+    val_dir = os.path.join(args.data_dir, "val")
     assert os.path.isdir(val_dir), "No validation directory found"
 
     # Training data
@@ -41,42 +57,50 @@ if __name__ == '__main__' :
     # val_filenames = [s for s in val_filenames if int(s.split("_")[1].split('/')[2]) < 10] ## REMOVE AFTER TESTS
     val_labels = [int(s.split("_")[1].split('/')[2]) for s in val_filenames]
 
+    # Data summary after loading
     print("Done loading data")
     print("Data summary :\n\tTraining set size {}\n\tValidation set size {}".format(
         len(train_filenames),
-        len(val_filenames)))
+        len(val_filenames))
+    )
 
     # Create the estimator
-    print("Creating estimator from/to " + os.path.join("experiments", args.model_dir))
+    print("Creating estimator from/to "
+        + os.path.join("experiments", args.model_dir))
     cnn_classifier = tf.estimator.Estimator(
         model_fn=vgg_model_fn,
-        model_dir=os.path.join("experiments", args.model_dir))
+        model_dir=os.path.join("experiments", args.model_dir)
+    )
 
-    print("Training classifier for {} steps".format(args.n_steps))
-    n_steps = int(args.n_steps)
-    cnn_classifier.train(
-            input_fn=lambda:input_fn(True,
-                                    train_filenames,
-                                    train_labels,
-                                    32),
-            steps=n_steps)
-    val_results = cnn_classifier.evaluate(
-            input_fn=lambda:input_fn(False,
-                                    val_filenames,
-                                    val_labels))
-
-    # for i in range(n_steps // 20000) :
-    #     cnn_classifier.train(
-    #         input_fn=lambda:input_fn(True,
-    #                                  train_filenames,
-    #                                  train_labels,
-    #                                  32),
-    #         steps=20000)
-    #     val_results = cnn_classifier.evaluate(
-    #         input_fn=lambda:input_fn(False,
-    #                                  val_filenames,
-    #                                  val_labels,
-    #                                  None))
-
+    # If the number of epochs is not defined (= 0), then train on number of
+    # steps and evaluate at the end of the training ...
+    if (n_epochs == 0) :
+        print("Training classifier for {} steps".format(n_steps))
+        cnn_classifier.train(
+                input_fn=lambda:input_fn(True,
+                                        train_filenames,
+                                        train_labels,
+                                        32),
+                steps=n_steps
+        )
+        val_results = cnn_classifier.evaluate(
+                input_fn=lambda:input_fn(False,
+                                        val_filenames,
+                                        val_labels)
+        )
+    # else train on multiple epochs and evaluate every epoch
+    else :
+        for i in range(n_epochs) :
+            cnn_classifier.train(
+                input_fn=lambda:input_fn(True,
+                                         train_filenames,
+                                         train_labels,
+                                         32)
+            )
+            val_results = cnn_classifier.evaluate(
+                input_fn=lambda:input_fn(False,
+                                         val_filenames,
+                                         val_labels)
+            )
     print("Results : \n{}".format(val_results))
     print("Done training")
