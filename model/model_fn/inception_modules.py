@@ -6,14 +6,21 @@ The layers are named as follows :
 
 import tensorflow as tf
 
-def stem(input) :
+def _single_frame_stem(input) :
+    # Reshape to 4D tensor
+    input = tf.reshape(
+        input,
+        [-1, 64, 64, 1]
+    )
+
     # Convolutional Layer #1 :
     stem_conv1 = tf.layers.conv2d(
         inputs=input,
-        filters=32,
+        filters=8,
         kernel_size=[3, 3],
         strides=2,
         padding="valid",
+        reuse=tf.AUTO_REUSE,
         activation=tf.nn.relu,
         name="stem_conv1"
     )
@@ -21,10 +28,11 @@ def stem(input) :
     # Convolutional Layer #2 :
     stem_conv2 = tf.layers.conv2d(
         inputs=stem_conv1,
-        filters=32,
+        filters=8,
         kernel_size=[3, 3],
         strides=1,
         padding="valid",
+        reuse=tf.AUTO_REUSE,
         activation=tf.nn.relu,
         name="stem_conv2"
     )
@@ -32,9 +40,10 @@ def stem(input) :
     # Convolutional Layer #3 :
     stem_conv3 = tf.layers.conv2d(
         inputs=stem_conv2,
-        filters=64,
+        filters=16,
         kernel_size=[3, 3],
         padding="same",
+        reuse=tf.AUTO_REUSE,
         activation=tf.nn.relu,
         name="stem_conv3"
     )
@@ -52,10 +61,11 @@ def stem(input) :
     # Convolutional Layer #1
     stem_b12_conv1 = tf.layers.conv2d(
         inputs=stem_conv3,
-        filters=96,
+        filters=24,
         kernel_size=[3, 3],
         strides=2,
         padding="valid",
+        reuse=tf.AUTO_REUSE,
         activation=tf.nn.relu,
         name="stem_b12_conv1"
     )
@@ -71,18 +81,20 @@ def stem(input) :
     # Convolutional Layer #1
     stem_b21_conv1 = tf.layers.conv2d(
         inputs=stem_junction1,
-        filters=64,
+        filters=16,
         kernel_size=[1, 3],
         padding="same",
+        reuse=tf.AUTO_REUSE,
         activation=tf.nn.relu,
         name="stem_b21_conv1"
     )
     # Convolutional Layer #2
     stem_b21_conv2 = tf.layers.conv2d(
         inputs=stem_b21_conv1,
-        filters=96,
+        filters=24,
         kernel_size=[3, 3],
         padding="valid",
+        reuse=tf.AUTO_REUSE,
         activation=tf.nn.relu,
         name="stem_b21_conv2"
     )
@@ -90,37 +102,41 @@ def stem(input) :
     # Convolutional Layer #1
     stem_b22_conv1 = tf.layers.conv2d(
         inputs=stem_junction1,
-        filters=64,
+        filters=16,
         kernel_size=[1, 3],
         padding="same",
+        reuse=tf.AUTO_REUSE,
         activation=tf.nn.relu,
         name="stem_b22_conv1"
     )
     # Convolutional Layer #2
     stem_b22_conv2 = tf.layers.conv2d(
         inputs=stem_b22_conv1,
-        filters=64,
+        filters=16,
         kernel_size=[1, 5],
         padding="same",
+        reuse=tf.AUTO_REUSE,
         activation=tf.nn.relu,
         name="stem_b22_conv2"
     )
     # Convolutional Layer #3
     stem_b22_conv3 = tf.layers.conv2d(
         inputs=stem_b22_conv2,
-        filters=64,
+        filters=16,
         kernel_size=[5, 1],
         padding="same",
+        reuse=tf.AUTO_REUSE,
         activation=tf.nn.relu,
         name="stem_b22_conv3"
     )
     # Convolutional Layer #4
     stem_b22_conv4 = tf.layers.conv2d(
         inputs=stem_b22_conv3,
-        filters=96,
+        filters=24,
         kernel_size=[3, 3],
         strides=1,
         padding="valid",
+        reuse=tf.AUTO_REUSE,
         activation=tf.nn.relu,
         name="stem_b22_conv4"
     )
@@ -131,6 +147,25 @@ def stem(input) :
         name="stem_junction2"
     )
     return stem_junction2
+
+def stem(inputs) :
+    # Stem on every frame
+    stem_output = [_single_frame_stem(inputs[:, :, :, i]) for i in range(29)]
+    # Concatenate all outputs into a single tensor
+    stem_output = tf.concat(
+        values=stem_output,
+        axis=3,
+        name="stem_output_concat"
+    )
+    # Convolutional Layer to reduce dimension
+    stem_dim = tf.layers.conv2d(
+        inputs=stem_output,
+        filters=192,
+        kernel_size=[1, 1],
+        activation=tf.nn.relu,
+        name="stem_dim"
+    )
+    return stem_dim
 
 def inception_A(input) :
     # Bifurcation #1
