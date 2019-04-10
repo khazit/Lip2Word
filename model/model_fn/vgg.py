@@ -182,7 +182,7 @@ def vgg_model_fn(features, labels, mode):
         name='acc_op'
     )
     topk_accuracy = tf.metrics.mean(
-        tf.math.in_top_k(
+        tf.nn.in_top_k(
             predictions=logits,
             targets=labels,
             k=3
