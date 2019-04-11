@@ -2,6 +2,7 @@ data/**
 experiments/**
 test_notebooks/**
 *.ipynb
+*.json
 
 .DS_Store
 .ipynb_checkpoints
