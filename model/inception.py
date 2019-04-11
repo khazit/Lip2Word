@@ -64,7 +64,7 @@ def _build_model(inputs, num_classes, is_training):
     )
     return logits
 
-def inception_model_fn(features, labels, mode):
+def inception_model_fn(features, labels, mode, params):
     """
     Model function for the CNN (Inception architecture)
     Args :
@@ -75,7 +75,7 @@ def inception_model_fn(features, labels, mode):
         - Custom Estimator
     """
     # Useful variables
-    num_classes = 500
+    num_classes = params["num_classes"]
     if (mode == tf.estimator.ModeKeys.TRAIN) :
         is_training = tf.constant(True, dtype=tf.bool)
     else :
@@ -158,13 +158,13 @@ def inception_model_fn(features, labels, mode):
         )
 
     # Learning rate
-    starter_learning_rate = 0.002
+    starter_learning_rate = params["starter_learning_rate"]
     global_step = tf.train.get_global_step()
     learning_rate = tf.train.exponential_decay(
-        starter_learning_rate,
-        global_step,
-        20000,
-        0.79,
+        learning_rate=starter_learning_rate,
+        global_step=global_step,
+        decay_steps=params["decay_steps"],
+        decay_rate=params["decay_rate"],
         staircase=False
     )
 
@@ -174,7 +174,7 @@ def inception_model_fn(features, labels, mode):
     # Optimizer specifications
     optimizer = tf.train.MomentumOptimizer(
         learning_rate=learning_rate,
-        momentum=0.9
+        momentum=params["optimizer_momentum"]
     )
     train_op = optimizer.minimize(
         loss=loss,
@@ -182,8 +182,8 @@ def inception_model_fn(features, labels, mode):
     )
 
     # Add the update ops for the moving_mean and moving_variance of batchnorm
-    update_ops = tf.get_collection(tf.GraphKeys.UPDATE_OPS)
-    train_op = tf.group([train_op, update_ops])
+    # update_ops = tf.get_collection(tf.GraphKeys.UPDATE_OPS)
+    # train_op = tf.group([train_op, update_ops])
 
     return tf.estimator.EstimatorSpec(
         mode=mode,

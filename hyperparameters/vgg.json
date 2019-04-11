@@ -1,0 +1,7 @@
+{
+  "num_classes": 500,
+  "starter_learning_rate": 0.002,
+  "decay_steps": 20000,
+  "decay_rate": 0.79,
+  "optimizer_momentum": 0.9
+}

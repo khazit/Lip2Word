@@ -4,6 +4,7 @@ Describe the training.
 
 import argparse
 import os
+import json
 import numpy as np
 import tensorflow as tf
 from pathlib import Path
@@ -20,14 +21,14 @@ parser.add_argument(
     help="Directory with processed dataset"
 )
 parser.add_argument(
-    '--model_dir',
-    default=None,
-    help="Model directory"
-)
-parser.add_argument(
     '--model_fn',
     default="vgg",
     help="Model function (vgg or inception)"
+)
+parser.add_argument(
+    '--params_file',
+    default="",
+    help="Path to the .json file containing the parameters"
 )
 parser.add_argument(
     '--n_steps',
@@ -45,13 +46,21 @@ if __name__ == '__main__' :
     # Parse arguments
     args = parser.parse_args()
 
-    # Useful variable
+    # Useful variables
     if args.model_fn == "vgg":
         model_fn = vgg_model_fn
     elif args.model_fn == "inception":
         model_fn = inception_model_fn
     n_steps = int(args.n_steps)
     n_epochs = int(args.n_epochs)
+    model_dir = os.path.join("experiments", args.params_file)
+
+    # Check if .json file exists, then read it
+    params_file = os.path.join("hyperparameters", args.params_file + ".json")
+    assert os.path.isfile(params_file), "No .json file found"
+    with open(params_file) as json_file:
+        params = json.load(json_file)
+    print("Parameters used :\n{}".format(params))
 
     # Check if dataset exists
     print("Loading dataset from "+args.data_dir)
@@ -81,49 +90,55 @@ if __name__ == '__main__' :
 
     # Create the estimator
     print("Creating estimator from/to "
-        + os.path.join("experiments", args.model_dir))
+        + model_dir)
     cnn_classifier = tf.estimator.Estimator(
         model_fn=model_fn,
-        model_dir=os.path.join("experiments", args.model_dir)
+        model_dir=model_dir,
+        params=params
     )
 
     # If the number of epochs is not defined (= 0), then train on number of
     # steps and evaluate at the end of the training ...
-    if (n_epochs == 0) :
-        print("Training classifier for {} steps".format(n_steps))
-        cnn_classifier.train(
-            input_fn=lambda:input_fn(
-                True,
-                train_filenames,
-                train_labels,
-                32
-            ),
-            steps=n_steps
-        )
-        val_results = cnn_classifier.evaluate(
-            input_fn=lambda:input_fn(
-                False,
-                val_filenames,
-                val_labels
-            )
-        )
-    # else train on multiple epochs and evaluate every epoch
-    else :
-        for i in range(n_epochs) :
-            cnn_classifier.train(
-                input_fn=lambda:input_fn(
-                    True,
-                    train_filenames,
-                    train_labels,
-                    32
-                )
-            )
-            val_results = cnn_classifier.evaluate(
-                input_fn=lambda:input_fn(
-                    False,
-                    val_filenames,
-                    val_labels
-                )
-            )
-    print("Results : \n{}".format(val_results))
+    # if (n_epochs == 0) :
+    #     print("Training classifier for {} steps".format(n_steps))
+    #     cnn_classifier.train(
+    #         input_fn=lambda:input_fn(
+    #             True,
+    #             train_filenames,
+    #             train_labels,
+    #             32
+    #         ),
+    #         steps=n_steps
+    #     )
+    #     val_results = cnn_classifier.evaluate(
+    #         input_fn=lambda:input_fn(
+    #             False,
+    #             val_filenames,
+    #             val_labels
+    #         )
+    #     )
+    # # else train on multiple epochs and evaluate every epoch
+    # else :
+    #     for i in range(n_epochs) :
+    #         cnn_classifier.train(
+    #             input_fn=lambda:input_fn(
+    #                 True,
+    #                 train_filenames,
+    #                 train_labels,
+    #                 32
+    #             )
+    #         )
+    #         val_results = cnn_classifier.evaluate(
+    #             input_fn=lambda:input_fn(
+    #                 False,
+    #                 val_filenames,
+    #                 val_labels
+    #             )
+    #         )
+    # print("Results : \n{}".format(val_results))
     print("Done training")
+
+    # Save results to .json file
+    with open(os.path.join(model_dir, "results.json"), 'w') as outfile:
+        json.dump(val_results, outfile)
+    print("Results saved to {}".format(model_dir))
