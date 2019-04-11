@@ -1,5 +1,10 @@
 import tensorflow as tf
-from model.model_fn.inception_modules import *
+from model.utils import stem
+from model.utils import inception_A
+from model.utils import inception_B
+from model.utils import inception_C
+from model.utils import reduction_A
+from model.utils import reduction_B
 
 def _build_model(inputs, num_classes, is_training):
     """

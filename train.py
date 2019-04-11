@@ -2,14 +2,15 @@
 Describe the training.
 """
 
-from model.model_fn.vgg import vgg_model_fn
-from model.model_fn.inception import inception_model_fn
-from model.input_fn import input_fn
 import argparse
 import os
-from pathlib import Path
 import numpy as np
 import tensorflow as tf
+from pathlib import Path
+from model.vgg import vgg_model_fn
+from model.inception import inception_model_fn
+from model.input_fn import input_fn
+
 tf.logging.set_verbosity(tf.logging.INFO)
 
 parser = argparse.ArgumentParser()

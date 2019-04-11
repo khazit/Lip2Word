@@ -8,8 +8,8 @@ https://gist.github.com/dalgu90/a9952dfd372cbe1cdc529b204329e189
 import sys
 import tensorflow as tf
 import numpy as np
-from model.model_fn.vgg import vgg_model_fn
-from model.model_fn.inception import inception_model_fn
+from model.vgg import vgg_model_fn
+from model.inception import inception_model_fn
 
 
 if len(sys.argv) == 3:

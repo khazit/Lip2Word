@@ -1,10 +1,28 @@
-"""
-Define the different inceptions modules.
-The layers are named as follows :
-[block type]_b[bifurcation number][branch number]?_[layer type][layer number]
-"""
-
 import tensorflow as tf
+
+################################################################################
+# General utility functions.
+################################################################################
+
+def batch_norm(inputs, is_training) :
+    '''
+    Utility function. BatchNorm + ReLu
+    Args :
+        - inputs : a tensor of inputs
+        - is_training : a bool
+    Return :
+        - Tensor after BatchNorm + ReLu. Same shape as inputs
+    '''
+    inputs =  tf.layers.batch_normalization(
+        inputs=inputs,
+        training=is_training)
+    return tf.nn.relu(inputs)
+
+################################################################################
+# Inception modules.
+# The layers are named as follows :
+# [block type]_b[bifurcation number][branch number]?_[layer type][layer number]
+################################################################################
 
 def _single_frame_stem(input) :
     # Reshape to 4D tensor
