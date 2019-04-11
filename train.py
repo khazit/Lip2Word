@@ -97,45 +97,45 @@ if __name__ == '__main__' :
         params=params
     )
 
-    # If the number of epochs is not defined (= 0), then train on number of
-    # steps and evaluate at the end of the training ...
-    # if (n_epochs == 0) :
-    #     print("Training classifier for {} steps".format(n_steps))
-    #     cnn_classifier.train(
-    #         input_fn=lambda:input_fn(
-    #             True,
-    #             train_filenames,
-    #             train_labels,
-    #             32
-    #         ),
-    #         steps=n_steps
-    #     )
-    #     val_results = cnn_classifier.evaluate(
-    #         input_fn=lambda:input_fn(
-    #             False,
-    #             val_filenames,
-    #             val_labels
-    #         )
-    #     )
-    # # else train on multiple epochs and evaluate every epoch
-    # else :
-    #     for i in range(n_epochs) :
-    #         cnn_classifier.train(
-    #             input_fn=lambda:input_fn(
-    #                 True,
-    #                 train_filenames,
-    #                 train_labels,
-    #                 32
-    #             )
-    #         )
-    #         val_results = cnn_classifier.evaluate(
-    #             input_fn=lambda:input_fn(
-    #                 False,
-    #                 val_filenames,
-    #                 val_labels
-    #             )
-    #         )
-    # print("Results : \n{}".format(val_results))
+    If the number of epochs is not defined (= 0), then train on number of
+    steps and evaluate at the end of the training ...
+    if (n_epochs == 0) :
+        print("Training classifier for {} steps".format(n_steps))
+        cnn_classifier.train(
+            input_fn=lambda:input_fn(
+                True,
+                train_filenames,
+                train_labels,
+                32
+            ),
+            steps=n_steps
+        )
+        val_results = cnn_classifier.evaluate(
+            input_fn=lambda:input_fn(
+                False,
+                val_filenames,
+                val_labels
+            )
+        )
+    # else train on multiple epochs and evaluate every epoch
+    else :
+        for i in range(n_epochs) :
+            cnn_classifier.train(
+                input_fn=lambda:input_fn(
+                    True,
+                    train_filenames,
+                    train_labels,
+                    32
+                )
+            )
+            val_results = cnn_classifier.evaluate(
+                input_fn=lambda:input_fn(
+                    False,
+                    val_filenames,
+                    val_labels
+                )
+            )
+    print("Results : \n{}".format(val_results))
     print("Done training")
 
     # Save results to .json file
