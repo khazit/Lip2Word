@@ -1,7 +1,7 @@
 import tensorflow as tf
 from model.utils import batch_norm
 
-def vgg_model_fn(features, labels, mode):
+def vgg_model_fn(features, labels, mode, params):
     """
     Model function for the CNN (Multiple Towers)
     Code inspired by https://www.tensorflow.org/tutorials/estimators/cnn
@@ -14,7 +14,7 @@ def vgg_model_fn(features, labels, mode):
     """
     # Useful variables
     num_frames = 29
-    num_classes = 500
+    num_classes = params["num_classes"]
     if (mode == tf.estimator.ModeKeys.TRAIN) :
         is_training = tf.constant(True, dtype=tf.bool)
     else :
@@ -223,13 +223,13 @@ def vgg_model_fn(features, labels, mode):
         )
 
     # Learning rate
-    starter_learning_rate = 0.002
+    starter_learning_rate = params["starter_learning_rate"]
     global_step = tf.train.get_global_step()
     learning_rate = tf.train.exponential_decay(
-        starter_learning_rate,
-        global_step,
-        20000,
-        0.79,
+        learning_rate=starter_learning_rate,
+        global_step=global_step,
+        decay_steps=params["decay_steps"],
+        decay_rate=params["decay_rate"],
         staircase=False
     )
 
@@ -239,7 +239,7 @@ def vgg_model_fn(features, labels, mode):
     # Optimizer specifications
     optimizer = tf.train.MomentumOptimizer(
         learning_rate=learning_rate,
-        momentum=0.9
+        momentum=params["optimizer_momentum"]
     )
     train_op = optimizer.minimize(
         loss=loss,

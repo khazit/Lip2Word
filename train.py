@@ -4,6 +4,7 @@ Describe the training.
 
 import argparse
 import os
+import json
 import numpy as np
 import tensorflow as tf
 from pathlib import Path
@@ -20,14 +21,14 @@ parser.add_argument(
     help="Directory with processed dataset"
 )
 parser.add_argument(
-    '--model_dir',
-    default=None,
-    help="Model directory"
-)
-parser.add_argument(
     '--model_fn',
     default="vgg",
     help="Model function (vgg or inception)"
+)
+parser.add_argument(
+    '--params_file',
+    default="",
+    help="Path to the .json file containing the parameters"
 )
 parser.add_argument(
     '--n_steps',
@@ -45,13 +46,21 @@ if __name__ == '__main__' :
     # Parse arguments
     args = parser.parse_args()
 
-    # Useful variable
+    # Useful variables
     if args.model_fn == "vgg":
         model_fn = vgg_model_fn
     elif args.model_fn == "inception":
         model_fn = inception_model_fn
     n_steps = int(args.n_steps)
     n_epochs = int(args.n_epochs)
+    model_dir = os.path.join("experiments", args.params_file)
+
+    # Check if .json file exists, then read it
+    params_file = os.path.join("hyperparameters", args.params_file + ".json")
+    assert os.path.isfile(params_file), "No .json file found"
+    with open(params_file) as json_file:
+        params = json.load(json_file)
+    print("Parameters used :\n{}".format(params))
 
     # Check if dataset exists
     print("Loading dataset from "+args.data_dir)
@@ -63,13 +72,13 @@ if __name__ == '__main__' :
     # Training data
     train_pathlist = Path(train_dir).glob("*.jpg")
     train_filenames = [str(path) for path in train_pathlist]
-    #train_filenames = [s for s in train_filenames if int(s.split("_")[1].split('/')[2]) < 10] ## REMOVE AFTER TESTS
+    train_filenames = [s for s in train_filenames if int(s.split("_")[1].split('/')[2]) < 10] ## REMOVE AFTER TESTS
     train_labels = [int(s.split("_")[1].split('/')[2]) for s in train_filenames]
 
     # Validation data
     val_pathlist = Path(val_dir).glob("*.jpg")
     val_filenames = [str(path) for path in val_pathlist]
-    #val_filenames = [s for s in val_filenames if int(s.split("_")[1].split('/')[2]) < 10] ## REMOVE AFTER TESTS
+    val_filenames = [s for s in val_filenames if int(s.split("_")[1].split('/')[2]) < 10] ## REMOVE AFTER TESTS
     val_labels = [int(s.split("_")[1].split('/')[2]) for s in val_filenames]
 
     # Data summary after loading
@@ -81,10 +90,11 @@ if __name__ == '__main__' :
 
     # Create the estimator
     print("Creating estimator from/to "
-        + os.path.join("experiments", args.model_dir))
+        + model_dir)
     cnn_classifier = tf.estimator.Estimator(
         model_fn=model_fn,
-        model_dir=os.path.join("experiments", args.model_dir)
+        model_dir=model_dir,
+        params=params
     )
 
     # If the number of epochs is not defined (= 0), then train on number of
@@ -127,3 +137,8 @@ if __name__ == '__main__' :
             )
     print("Results : \n{}".format(val_results))
     print("Done training")
+
+    # Save results to .json file
+    with open(os.path.join(model_dir, "results.json"), 'w') as outfile:
+        json.dump(val_results, outfile)
+    print("Results saved to {}".format(model_dir))
