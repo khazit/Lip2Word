@@ -113,8 +113,8 @@ if __name__ == '__main__' :
             input_fn=lambda:input_fn(
                 is_training=True,
                 num_epochs=-1,
-                filenames=train_filenames[:100],
-                labels=train_labels[:100],
+                filenames=train_filenames,
+                labels=train_labels,
                 batch_size=32
             ),
             steps=n_steps

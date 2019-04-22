@@ -55,11 +55,14 @@ def _import_fn(filename, label):
 def _preprocess_fn(video, label) :
     """
     Data augmentation function
+        - Random brightness
+        - Random contrast
+        - Random left/right flip
     Args :
         - video:
         - label: label of the video [0-499]
     Returns :
-        - video: same as input but with random contrast and brightness applied
+        - video: same as input after preprocessing
         - label: label of the video [0-499]
     """
     video = tf.image.random_contrast(
@@ -68,13 +71,16 @@ def _preprocess_fn(video, label) :
         upper=0.7,
     )
     video = tf.image.random_brightness(
-        imahe=video,
+        image=video,
         max_delta=32.0 / 255.0
+    )
+    video = tf.image.random_flip_left_right(
+        image=video
     )
     # Make sure the values are still in [0, 1]
     video = tf.clip_by_value(
-        image=video,
-        0.0,
-        1.0
+        t=video,
+        clip_value_min=0.0,
+        clip_value_max=1.0
     )
     return video, label
