@@ -40,6 +40,11 @@ parser.add_argument(
     default=0,
     help="Number of epochs"
 )
+parser.add_argument(
+    '--debugging',
+    default=False,
+    help="Enable the debugging mode (infinite epochs)"
+)
 
 
 if __name__ == '__main__' :
@@ -51,6 +56,8 @@ if __name__ == '__main__' :
         model_fn = vgg_model_fn
     elif args.model_fn == "inception":
         model_fn = inception_model_fn
+    if args.debugging == "True" :
+        debugging = True
     n_steps = int(args.n_steps)
     n_epochs = int(args.n_epochs)
     model_dir = os.path.join("experiments", args.params_file)
@@ -72,13 +79,13 @@ if __name__ == '__main__' :
     # Training data
     train_pathlist = Path(train_dir).glob("*.jpg")
     train_filenames = [str(path) for path in train_pathlist]
-    train_filenames = [s for s in train_filenames if int(s.split("_")[1].split('/')[2]) < 10] ## REMOVE AFTER TESTS
+    train_filenames = [s for s in train_filenames if int(s.split("_")[1].split('/')[2]) < params["num_classes"]]
     train_labels = [int(s.split("_")[1].split('/')[2]) for s in train_filenames]
 
     # Validation data
     val_pathlist = Path(val_dir).glob("*.jpg")
     val_filenames = [str(path) for path in val_pathlist]
-    val_filenames = [s for s in val_filenames if int(s.split("_")[1].split('/')[2]) < 10] ## REMOVE AFTER TESTS
+    val_filenames = [s for s in val_filenames if int(s.split("_")[1].split('/')[2]) < params["num_classes"]]
     val_labels = [int(s.split("_")[1].split('/')[2]) for s in val_filenames]
 
     # Data summary after loading
@@ -97,24 +104,44 @@ if __name__ == '__main__' :
         params=params
     )
 
-    # If the number of epochs is not defined (= 0), then train on number of
-    # steps and evaluate at the end of the training ...
-    if (n_epochs == 0) :
+    if debugging :
         print("Training classifier for {} steps".format(n_steps))
         cnn_classifier.train(
             input_fn=lambda:input_fn(
-                True,
-                train_filenames,
-                train_labels,
-                32
+                is_training=True,
+                num_epochs=-1,
+                filenames=train_filenames,
+                labels=train_labels,
+                batch_size=32
             ),
             steps=n_steps
         )
         val_results = cnn_classifier.evaluate(
             input_fn=lambda:input_fn(
-                False,
-                val_filenames,
-                val_labels
+                is_training=False,
+                filenames=val_filenames,
+                labels=val_labels
+            )
+        )
+    # If the number of epochs is not defined (= 0), then train on number of
+    # steps and evaluate at the end of the training ...
+    elif (n_epochs == 0) :
+        print("Training classifier for {} steps".format(n_steps))
+        cnn_classifier.train(
+            input_fn=lambda:input_fn(
+                is_training=True,
+                num_epochs=1,
+                filenames=train_filenames,
+                labels=train_labels,
+                batch_size=32
+            ),
+            steps=n_steps
+        )
+        val_results = cnn_classifier.evaluate(
+            input_fn=lambda:input_fn(
+                is_training=False,
+                filenames=val_filenames,
+                labels=val_labels
             )
         )
     # else train on multiple epochs and evaluate every epoch
@@ -122,17 +149,18 @@ if __name__ == '__main__' :
         for i in range(n_epochs) :
             cnn_classifier.train(
                 input_fn=lambda:input_fn(
-                    True,
-                    train_filenames,
-                    train_labels,
-                    32
+                    is_training=True,
+                    num_epochs=1,
+                    filenames=train_filenames,
+                    labels=train_labels,
+                    batch_size=32
                 )
             )
             val_results = cnn_classifier.evaluate(
                 input_fn=lambda:input_fn(
-                    False,
-                    val_filenames,
-                    val_labels
+                    is_training=False,
+                    filenames=val_filenames,
+                    labels=val_labels
                 )
             )
     print("Results : \n{}".format(val_results))

@@ -22,21 +22,22 @@ def import_image(filename, label):
     video = tf.concat(video, axis=2)
     return video, label
 
-def input_fn(is_training, filenames, labels, batch_size=None):
+def input_fn(is_training, num_epochs=1, filenames, labels, batch_size=None):
     '''
     Input function
     Files names have format "{label}_{word}_{id}.jpg"
     Args :
         - is_training: whether to use the train or evaluation pipeline
+        - num_epochs: number of epochs
         - filenames: list of the filenames
         - labels: corresponding list of labels
         - batch_size: size of the batch
     '''
-    
-    num_samples = len(filenames)
 
+    num_samples = len(filenames)
     if is_training:
         dataset = (tf.data.Dataset.from_tensor_slices((tf.constant(filenames), tf.constant(labels)))
+                   .repeat(num_epochs)
                    .shuffle(num_samples)
                    .map(import_image, num_parallel_calls=8)
                    .batch(batch_size)
