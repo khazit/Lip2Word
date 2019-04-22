@@ -72,13 +72,13 @@ if __name__ == '__main__' :
     # Training data
     train_pathlist = Path(train_dir).glob("*.jpg")
     train_filenames = [str(path) for path in train_pathlist]
-    #train_filenames = [s for s in train_filenames if int(s.split("_")[1].split('/')[2]) < 10] ## REMOVE AFTER TESTS
+    train_filenames = [s for s in train_filenames if int(s.split("_")[1].split('/')[2]) < 10] ## REMOVE AFTER TESTS
     train_labels = [int(s.split("_")[1].split('/')[2]) for s in train_filenames]
 
     # Validation data
     val_pathlist = Path(val_dir).glob("*.jpg")
     val_filenames = [str(path) for path in val_pathlist]
-    #val_filenames = [s for s in val_filenames if int(s.split("_")[1].split('/')[2]) < 10] ## REMOVE AFTER TESTS
+    val_filenames = [s for s in val_filenames if int(s.split("_")[1].split('/')[2]) < 10] ## REMOVE AFTER TESTS
     val_labels = [int(s.split("_")[1].split('/')[2]) for s in val_filenames]
 
     # Data summary after loading
@@ -97,8 +97,8 @@ if __name__ == '__main__' :
         params=params
     )
 
-    If the number of epochs is not defined (= 0), then train on number of
-    steps and evaluate at the end of the training ...
+    # If the number of epochs is not defined (= 0), then train on number of
+    # steps and evaluate at the end of the training ...
     if (n_epochs == 0) :
         print("Training classifier for {} steps".format(n_steps))
         cnn_classifier.train(
