@@ -22,7 +22,7 @@ def import_image(filename, label):
     video = tf.concat(video, axis=2)
     return video, label
 
-def input_fn(is_training, num_epochs=1, filenames, labels, batch_size=None):
+def input_fn(is_training, filenames, labels, batch_size=None, num_epochs=1):
     '''
     Input function
     Files names have format "{label}_{word}_{id}.jpg"

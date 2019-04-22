@@ -52,15 +52,18 @@ if __name__ == '__main__' :
     args = parser.parse_args()
 
     # Useful variables
+    debugging = False
     if args.model_fn == "vgg":
         model_fn = vgg_model_fn
     elif args.model_fn == "inception":
         model_fn = inception_model_fn
     if args.debugging == "True" :
         debugging = True
+        model_dir = None
+    else :
+        model_dir = os.path.join("experiments", args.params_file)
     n_steps = int(args.n_steps)
     n_epochs = int(args.n_epochs)
-    model_dir = os.path.join("experiments", args.params_file)
 
     # Check if .json file exists, then read it
     params_file = os.path.join("hyperparameters", args.params_file + ".json")
@@ -96,8 +99,7 @@ if __name__ == '__main__' :
     )
 
     # Create the estimator
-    print("Creating estimator from/to "
-        + model_dir)
+    print("Creating the custom estimator")
     cnn_classifier = tf.estimator.Estimator(
         model_fn=model_fn,
         model_dir=model_dir,
@@ -105,13 +107,14 @@ if __name__ == '__main__' :
     )
 
     if debugging :
+        print("DEBUGGING MODE ENABLED")
         print("Training classifier for {} steps".format(n_steps))
         cnn_classifier.train(
             input_fn=lambda:input_fn(
                 is_training=True,
                 num_epochs=-1,
-                filenames=train_filenames,
-                labels=train_labels,
+                filenames=train_filenames[:100],
+                labels=train_labels[:100],
                 batch_size=32
             ),
             steps=n_steps
@@ -165,8 +168,12 @@ if __name__ == '__main__' :
             )
     print("Results : \n{}".format(val_results))
     print("Done training")
-
-    # Save results to .json file
-    with open(os.path.join(model_dir, "results.json"), 'w') as outfile:
-        json.dump(val_results, outfile)
-    print("Results saved to {}".format(model_dir))
+    
+    if not debugging :
+        # Save results to .json file
+        # But first convert values from float32 to string
+        for key in val_results :
+            val_results[key] = str(val_results[key])
+        with open(os.path.join(model_dir, "results.json"), 'w') as outfile:
+            json.dump(val_results, outfile)
+        print("Results saved to {}".format(model_dir))
