@@ -67,12 +67,12 @@ def _preprocess_fn(video, label) :
     """
     video = tf.image.random_contrast(
         image=video,
-        lower=0.3,
-        upper=0.7,
+        lower=1,
+        upper=1.10,
     )
     video = tf.image.random_brightness(
         image=video,
-        max_delta=32.0 / 255.0
+        max_delta=0.10
     )
     video = tf.image.random_flip_left_right(
         image=video
