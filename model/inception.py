@@ -6,67 +6,10 @@ from model.utils import inception_C
 from model.utils import reduction_A
 from model.utils import reduction_B
 
-def _build_model(inputs, num_classes, is_training):
-    """
-    Build the graph for the inception_v4 architecture
-    Architecture :
-        inputs          : (64 x 64 x  29)
-        stem            : (12 x 12 x 192)
-        inception_A     : (12 x 12 x 192)
-        reduction_A     : (10 x 10 x 512)
-        inception_B     : (10 x 10 x 512)
-        reduction_B     : ( 8 x  8 x 768)
-        inception_C     : ( 8 x  8 x 768)
-        average_pooling : (          768)
-    Args :
-        - inputs : Tensor of the inputs
-        - num_classes : number of number of classes
-        - is_training : whether it's training mode or inference mode
-    Returns :
-        - logits
-    """
-    # Stem
-    stem_output = stem(inputs)
-    # Inception-A
-    incepA_output = inception_A(stem_output)
-    # Reduction-A
-    reducA_output = reduction_A(incepA_output)
-    # Inception-B
-    incepB_output = inception_B(reducA_output)
-    # Reduction-B
-    reducB_output = reduction_B(incepB_output)
-    # Inception-C
-    incepC_output = inception_C(reducB_output)
-    # Average Pooling Layer
-    avg_pooling = tf.layers.average_pooling2d(
-        inputs=incepC_output,
-        pool_size=8,
-        strides=1,
-        padding="valid",
-        name="average_pooling"
-    )
-    # Dense Layer
-    dense = tf.layers.flatten(
-        inputs=avg_pooling,
-    )
-    # Dropout (keep 0.8)
-    dropout = tf.layers.dropout(
-        inputs=dense,
-        rate=0.2,
-        training=is_training,
-        name="dropout"
-    )
-    # Logits
-    logits = tf.layers.dense(
-        inputs=dense,
-        units=num_classes,
-        name="logits"
-    )
-    return logits
 
 def inception_model_fn(features, labels, mode, params):
     """
-    Model function for the CNN (Inception architecture)
+    Model function for the CNN (inception_v4 architecture)
     Args :
         - features: a dict of the features
         - labels: numpy array containing the labels
@@ -120,7 +63,7 @@ def inception_model_fn(features, labels, mode, params):
         tf.nn.in_top_k(
             predictions=logits,
             targets=labels,
-            k=3
+            k=10
         )
     )
     metrics = {
@@ -137,6 +80,7 @@ def inception_model_fn(features, labels, mode, params):
     #     tensor=tf.reshape(
     #         features[:, :, :, 1],
     #         [-1, 64, 64, 1]),
+    #     max_outputs=10,
     #     name="viz")
 
     # Logging hook
@@ -182,8 +126,8 @@ def inception_model_fn(features, labels, mode, params):
     )
 
     # Add the update ops for the moving_mean and moving_variance of batchnorm
-    # update_ops = tf.get_collection(tf.GraphKeys.UPDATE_OPS)
-    # train_op = tf.group([train_op, update_ops])
+    update_ops = tf.get_collection(tf.GraphKeys.UPDATE_OPS)
+    train_op = tf.group([train_op, update_ops])
 
     return tf.estimator.EstimatorSpec(
         mode=mode,
@@ -191,3 +135,72 @@ def inception_model_fn(features, labels, mode, params):
         train_op=train_op,
         training_hooks=[hook]
     )
+
+def _build_model(inputs, num_classes, is_training):
+    """
+    Build the graph for the inception_v4 architecture
+    Architecture :
+        inputs          : (64 x 64 x  29)
+        stem            : (12 x 12 x 192)
+        inception_A     : (12 x 12 x 192)
+        reduction_A     : (10 x 10 x 512)
+        inception_B     : (10 x 10 x 512)
+        reduction_B     : ( 8 x  8 x 768)
+        inception_C     : ( 8 x  8 x 768)
+        average_pooling : (          768)
+    Args :
+        - inputs : Tensor of the inputs
+        - num_classes : number of number of classes
+        - is_training : whether it's training mode or inference mode
+    Returns :
+        - logits
+    """
+    # Stem
+    stem_output = stem(inputs, is_training)
+    # Inception-A (x4)
+    incepA_output = inception_A(stem_output, is_training)
+    incepA_output = inception_A(incepA_output, is_training)
+    incepA_output = inception_A(incepA_output, is_training)
+    incepA_output = inception_A(incepA_output, is_training)
+    # Reduction-A
+    reducA_output = reduction_A(incepA_output, is_training)
+    # Inception-B (x7)
+    incepB_output = inception_B(reducA_output, is_training)
+    incepB_output = inception_B(incepB_output, is_training)
+    incepB_output = inception_B(incepB_output, is_training)
+    incepB_output = inception_B(incepB_output, is_training)
+    incepB_output = inception_B(incepB_output, is_training)
+    incepB_output = inception_B(incepB_output, is_training)
+    incepB_output = inception_B(incepB_output, is_training)
+    # Reduction-B
+    reducB_output = reduction_B(incepB_output, is_training)
+    # Inception-C (x3)
+    incepC_output = inception_C(reducB_output, is_training)
+    incepC_output = inception_C(incepC_output, is_training)
+    incepC_output = inception_C(incepC_output, is_training)
+    # Average Pooling Layer
+    avg_pooling = tf.layers.average_pooling2d(
+        inputs=incepC_output,
+        pool_size=8,
+        strides=1,
+        padding="valid",
+        name="average_pooling"
+    )
+    # Dense Layer
+    dense = tf.layers.flatten(
+        inputs=avg_pooling,
+    )
+    # Dropout (keep 0.8)
+    dropout = tf.layers.dropout(
+        inputs=dense,
+        rate=0.2,
+        training=is_training,
+        name="dropout"
+    )
+    # Logits
+    logits = tf.layers.dense(
+        inputs=dropout,
+        units=num_classes,
+        name="logits"
+    )
+    return logits
