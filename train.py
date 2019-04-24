@@ -52,7 +52,6 @@ if __name__ == '__main__' :
     args = parser.parse_args()
 
     # Useful variables
-    debugging = False
     if args.model_fn == "vgg":
         model_fn = vgg_model_fn
     elif args.model_fn == "inception":
@@ -61,6 +60,7 @@ if __name__ == '__main__' :
         debugging = True
         model_dir = None
     else :
+        debugging = False
         model_dir = os.path.join("experiments", args.params_file)
     n_steps = int(args.n_steps)
     n_epochs = int(args.n_epochs)
@@ -93,7 +93,7 @@ if __name__ == '__main__' :
 
     # Data summary after loading
     print("Done loading data")
-    print("Data summary :\n\tTraining set size {}\n\tValidation set size {}".format(
+    print("Data summary :\n* Training set size {}\n* Validation set size {}".format(
         len(train_filenames),
         len(val_filenames))
     )
@@ -113,8 +113,8 @@ if __name__ == '__main__' :
             input_fn=lambda:input_fn(
                 is_training=True,
                 num_epochs=-1,
-                filenames=train_filenames[:100],
-                labels=train_labels[:100],
+                filenames=train_filenames,
+                labels=train_labels,
                 batch_size=32
             ),
             steps=n_steps
@@ -168,7 +168,7 @@ if __name__ == '__main__' :
             )
     print("Results : \n{}".format(val_results))
     print("Done training")
-    
+
     if not debugging :
         # Save results to .json file
         # But first convert values from float32 to string

@@ -23,6 +23,7 @@ def vgg_model_fn(features, labels, mode, params):
     # Convolutional Layer #1 :
     # on every frame separately , shared weights
     conv1 = list()
+    bn = list()
     for i in range(num_frames) :
         conv1.append(
             tf.layers.conv2d(
@@ -33,14 +34,21 @@ def vgg_model_fn(features, labels, mode, params):
                 filters=48,
                 kernel_size=[3, 3],
                 padding="valid",
-                activation=tf.nn.relu,
                 name="conv1",
                 reuse=tf.AUTO_REUSE
             )
         )
+    for layer in conv1 :
+        bn.append(
+            batch_norm(
+                inputs=layer,
+                is_training=is_training,
+    		    layer_name="bn_conv1"
+            )
+        )
     # Concatenate tensors along time dimension
     conv1_concat = tf.concat(
-        values=conv1,
+        values=bn,
         axis=3,
         name="concat"
     )
@@ -61,7 +69,8 @@ def vgg_model_fn(features, labels, mode, params):
     )
     conv_dim = batch_norm(
         inputs=conv_dim,
-        is_training=is_training
+        is_training=is_training,
+		layer_name="bn_conv_dim"
     )
 
     # Convolutional and Pooling Layers #2
@@ -73,7 +82,8 @@ def vgg_model_fn(features, labels, mode, params):
     )
     conv2 = batch_norm(
         inputs=conv2,
-        is_training=is_training
+        is_training=is_training,
+		layer_name="bn_conv2"
     )
     pool2 = tf.layers.max_pooling2d(
         inputs=conv2,
@@ -91,7 +101,8 @@ def vgg_model_fn(features, labels, mode, params):
     )
     conv3 = batch_norm(
         inputs=conv3,
-        is_training=is_training
+        is_training=is_training,
+		layer_name="bn_conv3"
     )
 
     # Convolutional Layer #4
@@ -103,7 +114,8 @@ def vgg_model_fn(features, labels, mode, params):
     )
     conv4 = batch_norm(
         inputs=conv4,
-        is_training=is_training
+        is_training=is_training,
+		layer_name="bn_conv4"
     )
 
     # Convolutional and Pooling Layers #5
@@ -115,7 +127,8 @@ def vgg_model_fn(features, labels, mode, params):
     )
     conv5 = batch_norm(
         inputs=conv5,
-        is_training=is_training
+        is_training=is_training,
+		layer_name="bn_conv5"
     )
     pool5 = tf.layers.max_pooling2d(
         inputs=conv5,
@@ -139,7 +152,8 @@ def vgg_model_fn(features, labels, mode, params):
     )
     dense = batch_norm(
         inputs=dense,
-        is_training=is_training
+        is_training=is_training,
+		layer_name="bn_dense"
     )
 
     # IF OVERFITTING, USE DROPOUT HERE
@@ -185,7 +199,7 @@ def vgg_model_fn(features, labels, mode, params):
         tf.nn.in_top_k(
             predictions=logits,
             targets=labels,
-            k=3
+            k=10
         )
     )
     metrics = {
