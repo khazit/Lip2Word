@@ -165,15 +165,15 @@ def _build_model(inputs, num_classes, is_training):
     stem_output = stem(inputs, is_training)
     # Inception-A (x4)
     incepA_output = inception_A(stem_output, is_training)
-   # incepA_output = inception_A(incepA_output, is_training)
-   # incepA_output = inception_A(incepA_output, is_training)
+    incepA_output = inception_A(incepA_output, is_training)
+    incepA_output = inception_A(incepA_output, is_training)
    # incepA_output = inception_A(incepA_output, is_training)
     # Reduction-A
     reducA_output = reduction_A(incepA_output, is_training)
     # Inception-B (x7)
     incepB_output = inception_B(reducA_output, is_training)
-  #  incepB_output = inception_B(incepB_output, is_training)
-  #  incepB_output = inception_B(incepB_output, is_training)
+    incepB_output = inception_B(incepB_output, is_training)
+    incepB_output = inception_B(incepB_output, is_training)
   #  incepB_output = inception_B(incepB_output, is_training)
   #  incepB_output = inception_B(incepB_output, is_training)
   #  incepB_output = inception_B(incepB_output, is_training)
@@ -182,8 +182,8 @@ def _build_model(inputs, num_classes, is_training):
     reducB_output = reduction_B(incepB_output, is_training)
     # Inception-C (x3)
     incepC_output = inception_C(reducB_output, is_training)
-  #  incepC_output = inception_C(incepC_output, is_training)
-  #  incepC_output = inception_C(incepC_output, is_training)
+    incepC_output = inception_C(incepC_output, is_training)
+    incepC_output = inception_C(incepC_output, is_training)
     # Average Pooling Layer
     avg_pooling = tf.layers.average_pooling2d(
         inputs=incepC_output,
