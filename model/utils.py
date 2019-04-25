@@ -4,7 +4,7 @@ import tensorflow as tf
 # General utility functions.
 ################################################################################
 
-def batch_norm(inputs, is_training, layer_name) :
+def batch_norm(inputs, is_training, layer_name, reuse=False) :
     '''
     Utility function. BatchNorm + ReLu
     Args :
@@ -13,12 +13,19 @@ def batch_norm(inputs, is_training, layer_name) :
     Return :
         - Tensor after BatchNorm + ReLu. Same shape as inputs
     '''
-    inputs =  tf.layers.batch_normalization(
-        inputs=inputs,
-        reuse=tf.AUTO_REUSE,
-        name=layer_name,
-        training=is_training
-    )
+    if reuse :
+        inputs =  tf.layers.batch_normalization(
+            inputs=inputs,
+            reuse=tf.AUTO_REUSE,
+            name=layer_name,
+            training=is_training
+        )
+    else :
+        inputs =  tf.layers.batch_normalization(
+            inputs=inputs,
+            name=layer_name,
+            training=is_training
+        )
     return tf.nn.relu(inputs)
 
 ################################################################################
@@ -47,6 +54,7 @@ def _single_frame_stem(input, is_training) :
     stem_conv1 = batch_norm(
         inputs=stem_conv1,
         is_training=is_training,
+		reuse=True,
 		layer_name="bn_stem_conv1")
 
     # Convolutional Layer #2 :
@@ -62,6 +70,7 @@ def _single_frame_stem(input, is_training) :
     stem_conv2 = batch_norm(
         inputs=stem_conv2,
         is_training=is_training,
+		reuse=True,
 		layer_name="bn_stem_conv2")
 
     # Convolutional Layer #3 :
@@ -76,6 +85,7 @@ def _single_frame_stem(input, is_training) :
     stem_conv3 = batch_norm(
         inputs=stem_conv3,
         is_training=is_training,
+		reuse=True,
 		layer_name="bn_stem_conv3")
 
     # Bifurcation #1
@@ -101,6 +111,7 @@ def _single_frame_stem(input, is_training) :
     stem_b12_conv1 = batch_norm(
         inputs=stem_b12_conv1,
         is_training=is_training,
+		reuse=True,
 		layer_name="bn_stem_b12_conv1")
     # Junction #1
     stem_junction1 = tf.concat(
@@ -123,6 +134,7 @@ def _single_frame_stem(input, is_training) :
     stem_b21_conv1 = batch_norm(
         inputs=stem_b21_conv1,
         is_training=is_training,
+		reuse=True,
 		layer_name="bn_stem_b21_conv1")
     # Convolutional Layer #2
     stem_b21_conv2 = tf.layers.conv2d(
@@ -136,6 +148,7 @@ def _single_frame_stem(input, is_training) :
     stem_b21_conv2 = batch_norm(
         inputs=stem_b21_conv2,
         is_training=is_training,
+		reuse=True,
 		layer_name="bn_stem_b21_conv2")
     # Branch #2
     # Convolutional Layer #1
@@ -150,6 +163,7 @@ def _single_frame_stem(input, is_training) :
     stem_b22_conv1 = batch_norm(
         inputs=stem_b22_conv1,
         is_training=is_training,
+		reuse=True,
 		layer_name="bn_stem_b22_conv1")
     # Convolutional Layer #2
     stem_b22_conv2 = tf.layers.conv2d(
@@ -163,6 +177,7 @@ def _single_frame_stem(input, is_training) :
     stem_b22_conv2 = batch_norm(
         inputs=stem_b22_conv2,
         is_training=is_training,
+		reuse=True,
 		layer_name="bn_stem_b22_conv2")
     # Convolutional Layer #3
     stem_b22_conv3 = tf.layers.conv2d(
@@ -176,6 +191,7 @@ def _single_frame_stem(input, is_training) :
     stem_b22_conv3 = batch_norm(
         inputs=stem_b22_conv3,
         is_training=is_training,
+		reuse=True,
 		layer_name="bn_stem_b22_conv3")
     # Convolutional Layer #4
     stem_b22_conv4 = tf.layers.conv2d(
@@ -190,6 +206,7 @@ def _single_frame_stem(input, is_training) :
     stem_b22_conv4 = batch_norm(
         inputs=stem_b22_conv4,
         is_training=is_training,
+		reuse=True,
 		layer_name="bn_stem_b22_conv4")
     # Junction #2
     stem_junction2 = tf.concat(
@@ -239,7 +256,6 @@ def inception_A(input, is_training) :
         kernel_size=[1, 1],
         strides=1,
         padding="same",
-        reuse=tf.AUTO_REUSE,
         name="incepA_b11_conv1"
     )
     incepA_b11_conv1 = batch_norm(
@@ -256,7 +272,6 @@ def inception_A(input, is_training) :
         kernel_size=[1, 1],
         strides=1,
         padding="same",
-        reuse=tf.AUTO_REUSE,
         name="incepA_b12_conv1"
     )
     incepA_b12_conv1 = batch_norm(
@@ -273,7 +288,6 @@ def inception_A(input, is_training) :
         kernel_size=[1, 1],
         strides=1,
         padding="same",
-        reuse=tf.AUTO_REUSE,
         name="incepA_b13_conv1"
     )
     incepA_b13_conv1 = batch_norm(
@@ -288,7 +302,6 @@ def inception_A(input, is_training) :
         kernel_size=[3, 3],
         strides=1,
         padding="same",
-        reuse=tf.AUTO_REUSE,
         name="incepA_b13_conv2"
     )
     incepA_b13_conv2 = batch_norm(
@@ -305,7 +318,6 @@ def inception_A(input, is_training) :
         kernel_size=[1, 1],
         strides=1,
         padding="same",
-        reuse=tf.AUTO_REUSE,
         name="incepA_b14_conv1"
     )
     incepA_b14_conv1 = batch_norm(
@@ -320,7 +332,6 @@ def inception_A(input, is_training) :
         kernel_size=[3, 3],
         strides=1,
         padding="same",
-        reuse=tf.AUTO_REUSE,
         name="incepA_b14_conv2"
     )
     incepA_b14_conv2 = batch_norm(
@@ -335,7 +346,6 @@ def inception_A(input, is_training) :
         kernel_size=[3, 3],
         strides=1,
         padding="same",
-        reuse=tf.AUTO_REUSE,
         name="incepA_b14_conv3"
     )
     incepA_b14_conv3 = batch_norm(
@@ -458,7 +468,6 @@ def inception_B(input, is_training) :
         kernel_size=[1, 1],
         strides=1,
         padding="same",
-        reuse=tf.AUTO_REUSE,
         name="incepB_b11_conv1"
     )
     incepB_b11_conv1 = batch_norm(
@@ -475,7 +484,6 @@ def inception_B(input, is_training) :
         kernel_size=[1, 1],
         strides=1,
         padding="same",
-        reuse=tf.AUTO_REUSE,
         name="incepB_b12_conv1"
     )
     incepB_b12_conv1 = batch_norm(
@@ -492,7 +500,6 @@ def inception_B(input, is_training) :
         kernel_size=[1, 1],
         strides=1,
         padding="same",
-        reuse=tf.AUTO_REUSE,
         name="incepB_b13_conv1"
     )
     incepB_b13_conv1 = batch_norm(
@@ -507,7 +514,6 @@ def inception_B(input, is_training) :
         kernel_size=[1, 5],
         strides=1,
         padding="same",
-        reuse=tf.AUTO_REUSE,
         name="incepB_b13_conv2"
     )
     incepB_b13_conv2 = batch_norm(
@@ -522,7 +528,6 @@ def inception_B(input, is_training) :
         kernel_size=[5, 1],
         strides=1,
         padding="same",
-        reuse=tf.AUTO_REUSE,
         name="incepB_b13_conv3"
     )
     incepB_b13_conv3 = batch_norm(
@@ -539,7 +544,6 @@ def inception_B(input, is_training) :
         kernel_size=[1, 1],
         strides=1,
         padding="same",
-        reuse=tf.AUTO_REUSE,
         name="incepB_b14_conv1"
     )
     incepB_b14_conv1 = batch_norm(
@@ -554,7 +558,6 @@ def inception_B(input, is_training) :
         kernel_size=[1, 5],
         strides=1,
         padding="same",
-        reuse=tf.AUTO_REUSE,
         name="incepB_b14_conv2"
     )
     incepB_b14_conv2 = batch_norm(
@@ -569,7 +572,6 @@ def inception_B(input, is_training) :
         kernel_size=[5, 1],
         strides=1,
         padding="same",
-        reuse=tf.AUTO_REUSE,
         name="incepB_b14_conv3"
     )
     incepB_b14_conv3 = batch_norm(
@@ -584,7 +586,6 @@ def inception_B(input, is_training) :
         kernel_size=[1, 5],
         strides=1,
         padding="same",
-        reuse=tf.AUTO_REUSE,
         name="incepB_b14_conv4"
     )
     incepB_b14_conv4 = batch_norm(
@@ -599,7 +600,6 @@ def inception_B(input, is_training) :
         kernel_size=[5, 1],
         strides=1,
         padding="same",
-        reuse=tf.AUTO_REUSE,
         name="incepB_b14_conv5"
     )
     incepB_b14_conv5 = batch_norm(
@@ -748,7 +748,6 @@ def inception_C(input, is_training) :
         kernel_size=[1, 1],
         strides=1,
         padding="same",
-        reuse=tf.AUTO_REUSE,
         name="incepC_b11_conv1"
     )
     incepC_b11_conv1 = batch_norm(
@@ -765,7 +764,6 @@ def inception_C(input, is_training) :
         kernel_size=[1, 1],
         strides=1,
         padding="same",
-        reuse=tf.AUTO_REUSE,
         name="incepC_b12_conv1"
     )
     incepC_b12_conv1 = batch_norm(
@@ -782,7 +780,6 @@ def inception_C(input, is_training) :
         kernel_size=[1, 1],
         strides=1,
         padding="same",
-        reuse=tf.AUTO_REUSE,
         name="incepC_b13_conv1"
     )
     incepC_b13_conv1 = batch_norm(
@@ -799,7 +796,6 @@ def inception_C(input, is_training) :
         kernel_size=[1, 3],
         strides=1,
         padding="same",
-        reuse=tf.AUTO_REUSE,
         name="incepC_b13_b11_conv1"
     )
     incepC_b13_b11_conv1 = batch_norm(
@@ -815,7 +811,6 @@ def inception_C(input, is_training) :
         kernel_size=[3, 1],
         strides=1,
         padding="same",
-        reuse=tf.AUTO_REUSE,
         name="incepC_b13_b12_conv1"
     )
     incepC_b13_b12_conv1 = batch_norm(
@@ -832,7 +827,6 @@ def inception_C(input, is_training) :
         kernel_size=[1, 1],
         strides=1,
         padding="same",
-        reuse=tf.AUTO_REUSE,
         name="incepC_b14_conv1"
     )
     incepC_b14_conv1 = batch_norm(
@@ -847,7 +841,6 @@ def inception_C(input, is_training) :
         kernel_size=[1, 3],
         strides=1,
         padding="same",
-        reuse=tf.AUTO_REUSE,
         name="incepC_b14_conv2"
     )
     incepC_b14_conv2 = batch_norm(
@@ -862,7 +855,6 @@ def inception_C(input, is_training) :
         kernel_size=[3, 1],
         strides=1,
         padding="same",
-        reuse=tf.AUTO_REUSE,
         name="incepC_b14_conv3"
     )
     incepC_b14_conv3 = batch_norm(
@@ -879,7 +871,6 @@ def inception_C(input, is_training) :
         kernel_size=[1, 3],
         strides=1,
         padding="same",
-        reuse=tf.AUTO_REUSE,
         name="incepC_b14_b11_conv1"
     )
     incepC_b14_b11_conv1 = batch_norm(
@@ -895,7 +886,6 @@ def inception_C(input, is_training) :
         kernel_size=[3, 1],
         strides=1,
         padding="same",
-        reuse=tf.AUTO_REUSE,
         name="incepC_b14_b12_conv1"
     )
     incepC_b14_b12_conv1 = batch_norm(
