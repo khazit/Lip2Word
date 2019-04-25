@@ -238,7 +238,7 @@ def stem(inputs, is_training) :
 		layer_name="bn_stem_dim")
     return stem_dim
 
-def inception_A(input, is_training) :
+def inception_A(input, is_training, block_number) :
     # Bifurcation #1
     # Branch #1
     # Average Pooling Layer #1
@@ -247,7 +247,7 @@ def inception_A(input, is_training) :
         pool_size=2,
         strides=1,
         padding="same",
-        name="incepA_b11_pool1"
+        name=block_number+"incepA_b11_pool1"
     )
     # Convolutional Layer #1
     incepA_b11_conv1 = tf.layers.conv2d(
@@ -256,12 +256,12 @@ def inception_A(input, is_training) :
         kernel_size=[1, 1],
         strides=1,
         padding="same",
-        name="incepA_b11_conv1"
+        name=block_number+"incepA_b11_conv1"
     )
     incepA_b11_conv1 = batch_norm(
         inputs=incepA_b11_conv1,
         is_training=is_training,
-		layer_name="bn_incepA_b11_conv1"
+		layer_name=block_number+"bn_incepA_b11_conv1"
     )
 
     # Branch #2
@@ -272,12 +272,12 @@ def inception_A(input, is_training) :
         kernel_size=[1, 1],
         strides=1,
         padding="same",
-        name="incepA_b12_conv1"
+        name=block_number+"incepA_b12_conv1"
     )
     incepA_b12_conv1 = batch_norm(
         inputs=incepA_b12_conv1,
         is_training=is_training,
-		layer_name="bn_incepA_b12_conv1"
+		layer_name=block_number+"bn_incepA_b12_conv1"
     )
 
     # Branch #3
@@ -288,12 +288,12 @@ def inception_A(input, is_training) :
         kernel_size=[1, 1],
         strides=1,
         padding="same",
-        name="incepA_b13_conv1"
+        name=block_number+"incepA_b13_conv1"
     )
     incepA_b13_conv1 = batch_norm(
         inputs=incepA_b13_conv1,
         is_training=is_training,
-		layer_name="bn_incepA_b13_conv1"
+		layer_name=block_number+"bn_incepA_b13_conv1"
     )
     # Convolutional Layer #2
     incepA_b13_conv2 = tf.layers.conv2d(
@@ -302,12 +302,12 @@ def inception_A(input, is_training) :
         kernel_size=[3, 3],
         strides=1,
         padding="same",
-        name="incepA_b13_conv2"
+        name=block_number+"incepA_b13_conv2"
     )
     incepA_b13_conv2 = batch_norm(
         inputs=incepA_b13_conv2,
         is_training=is_training,
-		layer_name="bn_incepA_b13_conv2"
+		layer_name=block_number+"bn_incepA_b13_conv2"
     )
 
     # Branch #4
@@ -318,12 +318,12 @@ def inception_A(input, is_training) :
         kernel_size=[1, 1],
         strides=1,
         padding="same",
-        name="incepA_b14_conv1"
+        name=block_number+"incepA_b14_conv1"
     )
     incepA_b14_conv1 = batch_norm(
         inputs=incepA_b14_conv1,
         is_training=is_training,
-		layer_name="bn_incepA_b14_conv1"
+		layer_name=block_number+"bn_incepA_b14_conv1"
     )
     # Convolutional Layer #1
     incepA_b14_conv2 = tf.layers.conv2d(
@@ -332,12 +332,12 @@ def inception_A(input, is_training) :
         kernel_size=[3, 3],
         strides=1,
         padding="same",
-        name="incepA_b14_conv2"
+        name=block_number+"incepA_b14_conv2"
     )
     incepA_b14_conv2 = batch_norm(
         inputs=incepA_b14_conv2,
         is_training=is_training,
-		layer_name="bn_incepA_b14_conv2"
+		layer_name=block_number+"bn_incepA_b14_conv2"
     )
     # Convolutional Layer #3
     incepA_b14_conv3 = tf.layers.conv2d(
@@ -346,12 +346,12 @@ def inception_A(input, is_training) :
         kernel_size=[3, 3],
         strides=1,
         padding="same",
-        name="incepA_b14_conv3"
+        name=block_number+"incepA_b14_conv3"
     )
     incepA_b14_conv3 = batch_norm(
         inputs=incepA_b14_conv3,
         is_training=is_training,
-		layer_name="bn_incepA_b14_conv3"
+		layer_name=block_number+"bn_incepA_b14_conv3"
     )
 
     # Junction #1
@@ -363,7 +363,7 @@ def inception_A(input, is_training) :
             incepA_b14_conv3
         ],
         axis=3,
-        name="incepA_junction1"
+        name=block_number+"incepA_junction1"
     )
     return incepA_junction1
 
@@ -450,7 +450,7 @@ def reduction_A(inception_A, is_training) :
     )
     return reducA_junction1
 
-def inception_B(input, is_training) :
+def inception_B(input, is_training, block_number) :
     # Bifurcation #1
     # Branch #1
     # Average Pooling
@@ -459,7 +459,7 @@ def inception_B(input, is_training) :
         pool_size=2,
         strides=1,
         padding="same",
-        name="incepB_b11_pool1"
+        name=block_number+"incepB_b11_pool1"
     )
     # Convolutional Layer #1
     incepB_b11_conv1 = tf.layers.conv2d(
@@ -468,12 +468,12 @@ def inception_B(input, is_training) :
         kernel_size=[1, 1],
         strides=1,
         padding="same",
-        name="incepB_b11_conv1"
+        name=block_number+"incepB_b11_conv1"
     )
     incepB_b11_conv1 = batch_norm(
         inputs=incepB_b11_conv1,
         is_training=is_training,
-		layer_name="bn_incepB_b11_conv1"
+		layer_name=block_number+"bn_incepB_b11_conv1"
     )
 
     # Branch #2
@@ -484,12 +484,12 @@ def inception_B(input, is_training) :
         kernel_size=[1, 1],
         strides=1,
         padding="same",
-        name="incepB_b12_conv1"
+        name=block_number+"incepB_b12_conv1"
     )
     incepB_b12_conv1 = batch_norm(
         inputs=incepB_b12_conv1,
         is_training=is_training,
-		layer_name="bn_incepB_b12_conv1"
+		layer_name=block_number+"bn_incepB_b12_conv1"
     )
 
     # Branch #3
@@ -500,12 +500,12 @@ def inception_B(input, is_training) :
         kernel_size=[1, 1],
         strides=1,
         padding="same",
-        name="incepB_b13_conv1"
+        name=block_number+"incepB_b13_conv1"
     )
     incepB_b13_conv1 = batch_norm(
         inputs=incepB_b13_conv1,
         is_training=is_training,
-		layer_name="bn_incepB_b13_conv1"
+		layer_name=block_number+"bn_incepB_b13_conv1"
     )
     # Convolutional Layer #2
     incepB_b13_conv2 = tf.layers.conv2d(
@@ -514,12 +514,12 @@ def inception_B(input, is_training) :
         kernel_size=[1, 5],
         strides=1,
         padding="same",
-        name="incepB_b13_conv2"
+        name=block_number+"incepB_b13_conv2"
     )
     incepB_b13_conv2 = batch_norm(
         inputs=incepB_b13_conv2,
         is_training=is_training,
-		layer_name="bn_incepB_b13_conv2"
+		layer_name=block_number+"bn_incepB_b13_conv2"
     )
     # Convolutional Layer #3
     incepB_b13_conv3 = tf.layers.conv2d(
@@ -528,12 +528,12 @@ def inception_B(input, is_training) :
         kernel_size=[5, 1],
         strides=1,
         padding="same",
-        name="incepB_b13_conv3"
+        name=block_number+"incepB_b13_conv3"
     )
     incepB_b13_conv3 = batch_norm(
         inputs=incepB_b13_conv3,
         is_training=is_training,
-		layer_name="bn_incepB_b13_conv3"
+		layer_name=block_number+"bn_incepB_b13_conv3"
     )
 
     # Branch 4
@@ -544,12 +544,12 @@ def inception_B(input, is_training) :
         kernel_size=[1, 1],
         strides=1,
         padding="same",
-        name="incepB_b14_conv1"
+        name=block_number+"incepB_b14_conv1"
     )
     incepB_b14_conv1 = batch_norm(
         inputs=incepB_b14_conv1,
         is_training=is_training,
-		layer_name="bn_incepB_b14_conv1"
+		layer_name=block_number+"bn_incepB_b14_conv1"
     )
     # Convolutional Layer #2
     incepB_b14_conv2 = tf.layers.conv2d(
@@ -558,12 +558,12 @@ def inception_B(input, is_training) :
         kernel_size=[1, 5],
         strides=1,
         padding="same",
-        name="incepB_b14_conv2"
+        name=block_number+"incepB_b14_conv2"
     )
     incepB_b14_conv2 = batch_norm(
         inputs=incepB_b14_conv2,
         is_training=is_training,
-		layer_name="bn_incepB_b14_conv2"
+		layer_name=block_number+"bn_incepB_b14_conv2"
     )
     # Convolutional Layer #3
     incepB_b14_conv3 = tf.layers.conv2d(
@@ -572,12 +572,12 @@ def inception_B(input, is_training) :
         kernel_size=[5, 1],
         strides=1,
         padding="same",
-        name="incepB_b14_conv3"
+        name=block_number+"incepB_b14_conv3"
     )
     incepB_b14_conv3 = batch_norm(
         inputs=incepB_b14_conv3,
         is_training=is_training,
-		layer_name="bn_incepB_b14_conv3"
+		layer_name=block_number+"bn_incepB_b14_conv3"
     )
     # Convolutional Layer #4
     incepB_b14_conv4 = tf.layers.conv2d(
@@ -586,12 +586,12 @@ def inception_B(input, is_training) :
         kernel_size=[1, 5],
         strides=1,
         padding="same",
-        name="incepB_b14_conv4"
+        name=block_number+"incepB_b14_conv4"
     )
     incepB_b14_conv4 = batch_norm(
         inputs=incepB_b14_conv4,
         is_training=is_training,
-		layer_name="bn_incepB_b14_conv4"
+		layer_name=block_number+"bn_incepB_b14_conv4"
     )
     # Convolutional Layer #4
     incepB_b14_conv5 = tf.layers.conv2d(
@@ -600,12 +600,12 @@ def inception_B(input, is_training) :
         kernel_size=[5, 1],
         strides=1,
         padding="same",
-        name="incepB_b14_conv5"
+        name=block_number+"incepB_b14_conv5"
     )
     incepB_b14_conv5 = batch_norm(
         inputs=incepB_b14_conv5,
         is_training=is_training,
-		layer_name="bn_incepB_b14_conv"
+		layer_name=block_number+"bn_incepB_b14_conv"
     )
 
     # Junction 1
@@ -617,7 +617,7 @@ def inception_B(input, is_training) :
             incepB_b14_conv5
         ],
         axis=3,
-        name="incepB_junction1"
+        name=block_number+"incepB_junction1"
     )
     return incepB_junction1
 
@@ -730,7 +730,7 @@ def reduction_B(inception_B, is_training) :
     )
     return reducB_junction1
 
-def inception_C(input, is_training) :
+def inception_C(input, is_training, block_number) :
     # Bifurcation #1
     # Branch #1
     # Average Pooling
@@ -739,7 +739,7 @@ def inception_C(input, is_training) :
         pool_size=2,
         strides=1,
         padding="same",
-        name="incepC_b11_pool1"
+        name=block_number+"incepC_b11_pool1"
     )
     # Convolutional Layer #1
     incepC_b11_conv1 = tf.layers.conv2d(
@@ -748,12 +748,12 @@ def inception_C(input, is_training) :
         kernel_size=[1, 1],
         strides=1,
         padding="same",
-        name="incepC_b11_conv1"
+        name=block_number+"incepC_b11_conv1"
     )
     incepC_b11_conv1 = batch_norm(
         inputs=incepC_b11_conv1,
         is_training=is_training,
-		layer_name="bn_incepC_b11_conv1"
+		layer_name=block_number+"bn_incepC_b11_conv1"
     )
 
     # Branch #2
@@ -764,12 +764,12 @@ def inception_C(input, is_training) :
         kernel_size=[1, 1],
         strides=1,
         padding="same",
-        name="incepC_b12_conv1"
+        name=block_number+"incepC_b12_conv1"
     )
     incepC_b12_conv1 = batch_norm(
         inputs=incepC_b12_conv1,
         is_training=is_training,
-		layer_name="bn_incepC_b12_conv1"
+		layer_name=block_number+"bn_incepC_b12_conv1"
     )
 
     # Branch #3
@@ -780,12 +780,12 @@ def inception_C(input, is_training) :
         kernel_size=[1, 1],
         strides=1,
         padding="same",
-        name="incepC_b13_conv1"
+        name=block_number+"incepC_b13_conv1"
     )
     incepC_b13_conv1 = batch_norm(
         inputs=incepC_b13_conv1,
         is_training=is_training,
-		layer_name="bn_incepC_b13_conv1"
+		layer_name=block_number+"bn_incepC_b13_conv1"
     )
     # Bifurcation #1
     # Branch #1
@@ -796,12 +796,12 @@ def inception_C(input, is_training) :
         kernel_size=[1, 3],
         strides=1,
         padding="same",
-        name="incepC_b13_b11_conv1"
+        name=block_number+"incepC_b13_b11_conv1"
     )
     incepC_b13_b11_conv1 = batch_norm(
         inputs=incepC_b13_b11_conv1,
         is_training=is_training,
-		layer_name="bn_incepC_b13_b11_conv1"
+		layer_name=block_number+"bn_incepC_b13_b11_conv1"
     )
     # Branch #2
     # Convolutional Layer #1
@@ -811,12 +811,12 @@ def inception_C(input, is_training) :
         kernel_size=[3, 1],
         strides=1,
         padding="same",
-        name="incepC_b13_b12_conv1"
+        name=block_number+"incepC_b13_b12_conv1"
     )
     incepC_b13_b12_conv1 = batch_norm(
         inputs=incepC_b13_b12_conv1,
         is_training=is_training,
-		layer_name="bn_incepC_b13_b12_conv1"
+		layer_name=block_number+"bn_incepC_b13_b12_conv1"
     )
 
     # Branch #4
@@ -827,12 +827,12 @@ def inception_C(input, is_training) :
         kernel_size=[1, 1],
         strides=1,
         padding="same",
-        name="incepC_b14_conv1"
+        name=block_number+"incepC_b14_conv1"
     )
     incepC_b14_conv1 = batch_norm(
         inputs=incepC_b14_conv1,
         is_training=is_training,
-		layer_name="bn_incepC_b14_conv1"
+		layer_name=block_number+"bn_incepC_b14_conv1"
     )
     # Convolutional Layer #2
     incepC_b14_conv2 = tf.layers.conv2d(
@@ -841,12 +841,12 @@ def inception_C(input, is_training) :
         kernel_size=[1, 3],
         strides=1,
         padding="same",
-        name="incepC_b14_conv2"
+        name=block_number+"incepC_b14_conv2"
     )
     incepC_b14_conv2 = batch_norm(
         inputs=incepC_b14_conv2,
         is_training=is_training,
-		layer_name="bn_incepC_b14_conv2"
+		layer_name=block_number+"bn_incepC_b14_conv2"
     )
     # Convolutional Layer #3
     incepC_b14_conv3 = tf.layers.conv2d(
@@ -855,12 +855,12 @@ def inception_C(input, is_training) :
         kernel_size=[3, 1],
         strides=1,
         padding="same",
-        name="incepC_b14_conv3"
+        name=block_number+"incepC_b14_conv3"
     )
     incepC_b14_conv3 = batch_norm(
         inputs=incepC_b14_conv3,
         is_training=is_training,
-		layer_name="bn_incepC_b14_conv3"
+		layer_name=block_number+"bn_incepC_b14_conv3"
     )
     # Bifurcation #1
     # Branch #1
@@ -871,12 +871,12 @@ def inception_C(input, is_training) :
         kernel_size=[1, 3],
         strides=1,
         padding="same",
-        name="incepC_b14_b11_conv1"
+        name=block_number+"incepC_b14_b11_conv1"
     )
     incepC_b14_b11_conv1 = batch_norm(
         inputs=incepC_b14_b11_conv1,
         is_training=is_training,
-		layer_name="bn_incepC_b14_b11_conv1"
+		layer_name=block_number+"bn_incepC_b14_b11_conv1"
     )
     # Branch #2
     # Convolutional Layer #1
@@ -886,12 +886,12 @@ def inception_C(input, is_training) :
         kernel_size=[3, 1],
         strides=1,
         padding="same",
-        name="incepC_b14_b12_conv1"
+        name=block_number+"incepC_b14_b12_conv1"
     )
     incepC_b14_b12_conv1 = batch_norm(
         inputs=incepC_b14_b12_conv1,
         is_training=is_training,
-		layer_name="bn_incepC_b14_b12_conv1"
+		layer_name=block_number+"bn_incepC_b14_b12_conv1"
     )
 
     # Junction 1
@@ -905,6 +905,6 @@ def inception_C(input, is_training) :
             incepC_b14_b12_conv1
         ],
         axis=3,
-        name="incepC_junction1"
+        name=block_number+"incepC_junction1"
     )
     return incepC_junction1
