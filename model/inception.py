@@ -113,19 +113,13 @@ def inception_model_fn(features, labels, mode, params):
     )
 
     # Display more stuff on Tensorboard (training related)
-    #tf.summary.scalar('learning_rate', learning_rate)
+    tf.summary.scalar('learning_rate', learning_rate)
 
     # Optimizer specifications
     optimizer = tf.train.MomentumOptimizer(
         learning_rate=learning_rate,
         momentum=params["optimizer_momentum"]
     )
-
-    #optimizer = tf.train.RMSPropOptimizer(
-    #    learning_rate=learning_rate,
-    #    momentum=params["optimizer_momentum"],
-    #)
-    # optimizer = tf.train.AdamOptimizer(learning_rate=0.0003)
     train_op = optimizer.minimize(
         loss=loss,
         global_step=global_step
@@ -164,26 +158,24 @@ def _build_model(inputs, num_classes, is_training):
     # Stem
     stem_output = stem(inputs, is_training)
     # Inception-A (x4)
-    incepA_output = inception_A(stem_output, is_training, 1)
-    incepA_output = inception_A(incepA_output, is_training, 2)
-    incepA_output = inception_A(incepA_output, is_training, 3)
-    # incepA_output = inception_A(incepA_output, is_training)
+    incepA_output = inception_A(stem_output,   is_training, '1')
+    incepA_output = inception_A(incepA_output, is_training, '2')
+    incepA_output = inception_A(incepA_output, is_training, '3')
+    incepA_output = inception_A(incepA_output, is_training, '4')
     # Reduction-A
     reducA_output = reduction_A(incepA_output, is_training)
-    # Inception-B (x7)
-    incepB_output = inception_B(reducA_output, is_training, 1)
-    incepB_output = inception_B(incepB_output, is_training, 2)
-    incepB_output = inception_B(incepB_output, is_training, 3)
-    # incepB_output = inception_B(incepB_output, is_training)
-    # incepB_output = inception_B(incepB_output, is_training)
-    # incepB_output = inception_B(incepB_output, is_training)
-    # incepB_output = inception_B(incepB_output, is_training)
+    # Inception-B (x5)
+    incepB_output = inception_B(reducA_output, is_training, '1')
+    incepB_output = inception_B(incepB_output, is_training, '2')
+    incepB_output = inception_B(incepB_output, is_training, '3')
+    incepB_output = inception_B(incepB_output, is_training, '4')
+    incepB_output = inception_B(incepB_output, is_training, '5')
     # Reduction-B
     reducB_output = reduction_B(incepB_output, is_training)
     # Inception-C (x3)
-    incepC_output = inception_C(reducB_output, is_training, 1)
-    incepC_output = inception_C(incepC_output, is_training, 2)
-    incepC_output = inception_C(incepC_output, is_training, 3)
+    incepC_output = inception_C(reducB_output, is_training, '1')
+    incepC_output = inception_C(incepC_output, is_training, '2')
+    incepC_output = inception_C(incepC_output, is_training, '3')
     # Average Pooling Layer
     avg_pooling = tf.layers.average_pooling2d(
         inputs=incepC_output,
