@@ -1,4 +1,5 @@
 import os
+import json
 import argparse
 import numpy as np
 import tensorflow as tf
@@ -62,10 +63,10 @@ if __name__ == '__main__' :
     print("Test set size {}\n".format(len(test_filenames)))
 
     # Create the estimator
-    print("Creating estimator from/to " + os.path.join("experiments", args.model_dir))
     cnn_classifier = tf.estimator.Estimator(
         model_fn=model_fn,
-        model_dir=model_dir
+        model_dir=model_dir,
+        params=params
     )
 
     print("Evaluating model")
