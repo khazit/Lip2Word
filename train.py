@@ -119,31 +119,11 @@ if __name__ == '__main__' :
             ),
             steps=n_steps
         )
-    # If the number of epochs is not defined (= 0), then train on number of
-    # steps and evaluate at the end of the training ...
-    elif (n_epochs == 0) :
-        print("Training classifier for {} steps".format(n_steps))
-        cnn_classifier.train(
-            input_fn=lambda:input_fn(
-                is_training=True,
-                num_epochs=1,
-                filenames=train_filenames,
-                labels=train_labels,
-                batch_size=32
-            ),
-            steps=n_steps
-        )
-        val_results = cnn_classifier.evaluate(
-            input_fn=lambda:input_fn(
-                is_training=False,
-                filenames=val_filenames,
-                labels=val_labels
-            )
-        )
-        print("Results : \n{}".format(val_results))
-    # else train on multiple epochs and evaluate every epoch
     else :
-        for i in range(n_epochs) :
+        # If the number of epochs is not defined (= 0), then train on number of
+        # steps and evaluate at the end of the training ...
+        if (n_epochs == 0) :
+            print("Training classifier for {} steps".format(n_steps))
             cnn_classifier.train(
                 input_fn=lambda:input_fn(
                     is_training=True,
@@ -151,7 +131,8 @@ if __name__ == '__main__' :
                     filenames=train_filenames,
                     labels=train_labels,
                     batch_size=32
-                )
+                ),
+                steps=n_steps
             )
             val_results = cnn_classifier.evaluate(
                 input_fn=lambda:input_fn(
@@ -160,6 +141,25 @@ if __name__ == '__main__' :
                     labels=val_labels
                 )
             )
+        # else train on multiple epochs and evaluate every epoch
+        else :
+            for i in range(n_epochs) :
+                cnn_classifier.train(
+                    input_fn=lambda:input_fn(
+                        is_training=True,
+                        num_epochs=1,
+                        filenames=train_filenames,
+                        labels=train_labels,
+                        batch_size=32
+                    )
+                )
+                val_results = cnn_classifier.evaluate(
+                    input_fn=lambda:input_fn(
+                        is_training=False,
+                        filenames=val_filenames,
+                        labels=val_labels
+                    )
+                )
         print("Results : \n{}".format(val_results))
     print("Done training")
 
