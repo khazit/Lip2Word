@@ -59,7 +59,7 @@ def _preprocess_fn(video, label) :
         - Random contrast
         - Random left/right flip
     Args :
-        - video:
+        - video: 4D tensor 
         - label: label of the video [0-499]
     Returns :
         - video: same as input after preprocessing
