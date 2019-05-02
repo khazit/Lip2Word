@@ -15,7 +15,7 @@ from model.inception import inception_model_fn
 if len(sys.argv) == 3:
     model_dir = sys.argv[1]
 else:
-    print('Usage: python count_ckpt_param.py path_to_chkpt')
+    print("Usage : python3 parameter_count.py [model_dir] [model_fn]")
     sys.exit(1)
 
 if sys.argv[2] == "vgg" :
