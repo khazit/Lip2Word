@@ -113,18 +113,11 @@ if __name__ == '__main__' :
             input_fn=lambda:input_fn(
                 is_training=True,
                 num_epochs=-1,
-                filenames=train_filenames,
-                labels=train_labels,
+                filenames=train_filenames[:10],
+                labels=train_labels[:10],
                 batch_size=32
             ),
             steps=n_steps
-        )
-        val_results = cnn_classifier.evaluate(
-            input_fn=lambda:input_fn(
-                is_training=False,
-                filenames=val_filenames,
-                labels=val_labels
-            )
         )
     # If the number of epochs is not defined (= 0), then train on number of
     # steps and evaluate at the end of the training ...
@@ -147,6 +140,7 @@ if __name__ == '__main__' :
                 labels=val_labels
             )
         )
+        print("Results : \n{}".format(val_results))
     # else train on multiple epochs and evaluate every epoch
     else :
         for i in range(n_epochs) :
@@ -166,7 +160,7 @@ if __name__ == '__main__' :
                     labels=val_labels
                 )
             )
-    print("Results : \n{}".format(val_results))
+        print("Results : \n{}".format(val_results))
     print("Done training")
 
     if not debugging :
