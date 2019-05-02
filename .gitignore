@@ -3,7 +3,10 @@ experiments/**
 test_notebooks/**
 *.ipynb
 *.json
+
+# Params files
 !vgg.json
+!inception.json
 
 .DS_Store
 .ipynb_checkpoints
