@@ -48,7 +48,7 @@ To achieve that I chose to use Tensorflow’s data input pipeline. It allow us t
 #### Details
 The two networks were trained on a Nvidia GTX 1080 Ti GPU and an Intel Xeon CPU for 25 epochs or until the validation loss started increasing, whichever come first. The best results were obtained using Momentum SGD and Adam. The hyperparameters for the fine tuned models are stored in .json files (hyperparameter directory, see repo).
 
-### Results
+## Results
 The following table summarizes the results obtained and compares them with other methods.
 
 |                         |  Top-1 accuracy | Top-10 accuracy | Size of the model      | Training time |
@@ -60,7 +60,7 @@ The following table summarizes the results obtained and compares them with other
 Momentum SGD (after tuning) and Adam gave equal results. As you can see, the validation accuracy plots are nearly identical :
 ![resultats](https://image.noelshack.com/fichiers/2019/19/5/1557501042-acc.png)
 
-### Conclusion and extensions
+## Conclusion and extensions
 The Inception-v4 architecture achieved SOTA in both top-1 and top-10 accuracies. However the margin is small. There appears to be a plateau in the accuracy results, which can be attributed to some words in the dataset that are nearly homophones (“groups” and “troops”, or “ground” and “around”). The distinction between the singular and plural form is also difficult to establish (as in “report” and “reports” which are considered different words in the dataset).
 
 Using LSTMs and a RNN architecture could help increase the accuracy of the model, as they are more effective with temporal data.
@@ -68,6 +68,6 @@ Conditional probability can also be used to enhance the model. In the sentence �
 
 The progress made during this project is still very significant. We achieved higher accuracy with a smaller model (5 times less parameters), which is very important for putting it in production.
 
-### Acknowledgements
+## Acknowledgements
 Advice given by my supervisor, Clement Chatelain, has been a great help in this project and I would like to thank him for his valuable and constructive suggestions.
 I’m also grateful to Rob Cooper at BBC Research & Development for his help in obtaining the dataset.
