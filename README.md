@@ -18,6 +18,8 @@ The dataset consists of ~1000 utterances of 500 different words, spoken by diffe
 
 ![frames](https://lh5.googleusercontent.com/McVcrVr8wC7b2GaZHdeFtgJf9MhQXCzcRV7I4dmMJkKmFwbZFGBG1QC9brXc7HQoDWKL38a8hKq5dqpNfmnWKlk-Adm1PsP0pDoJLO_X=s622)
 
+*Joon Son Chung and Andrew Zisserman, “Lip Reading in the Wild*
+
 Link : http://www.robots.ox.ac.uk/~vgg/data/lip_reading/lrw1.html
 
 ## Network architecture and training
