@@ -104,21 +104,10 @@ def inception_model_fn(features, labels, mode, params):
     # Learning rate
     starter_learning_rate = params["starter_learning_rate"]
     global_step = tf.train.get_global_step()
-    learning_rate = tf.train.exponential_decay(
-        learning_rate=starter_learning_rate,
-        global_step=global_step,
-        decay_steps=params["decay_steps"],
-        decay_rate=params["decay_rate"],
-        staircase=False
-    )
-
-    # Display more stuff on Tensorboard (training related)
-    tf.summary.scalar('learning_rate', learning_rate)
 
     # Optimizer specifications
-    optimizer = tf.train.MomentumOptimizer(
-        learning_rate=learning_rate,
-        momentum=params["optimizer_momentum"]
+    optimizer = tf.train.AdamOptimizer(
+            learning_rate=starter_learning_rate
     )
     train_op = optimizer.minimize(
         loss=loss,
