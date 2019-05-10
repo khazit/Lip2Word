@@ -20,21 +20,20 @@ The dataset consists of ~1000 utterances of 500 different words, spoken by diffe
 
 Link : http://www.robots.ox.ac.uk/~vgg/data/lip_reading/lrw1.html
 
-## Network architecture and training
-
+## Network architecture and training
 ### Architecture
 This repository contains the source code for two different architectures :
 
 #### Multiple Towers
 The Multiple Towers architecture is largely inspired by the VGG-M architecture, but adapted to a video input. A convolutional layer and a pooling layer is first applied on every frame. We then concatenate all the outputs into a single 3D matrix. We finally apply a set a convolutions/poolings (see paper for more details)
 
-Paper : Joon Son Chung and Andrew Zisserman, “Lip Reading in the Wild”
+*Paper : Joon Son Chung and Andrew Zisserman, “Lip Reading in the Wild”*
 
 #### Inception-v4
 The other model is a slightly modified Inception-v4 architecture. This model is based on several very small convolutions, grouped in “blocks”, in order to drastically reduce the number of parameters Here, multiple frames pass through the same layers in the “stem” block because of the video input. We then concatenate the output in the same way that we did with the Multiple Towers architecture.
 The main advantage of this architecture is to allow us to have a very deep model with multiple blocks and layers without bearing the weight of a huge number of parameters.
 
-Paper : C.Szegedy, S.Ioffe, V.Vanhoucke, A.Alemi, “Inception-v4, Inception-ResNet and the Impact of Residual Connections on Learning”
+*Paper : C.Szegedy, S.Ioffe, V.Vanhoucke, A.Alemi, “Inception-v4, Inception-ResNet and the Impact of Residual Connections on Learning”*
 
 ### Training
 
@@ -54,7 +53,7 @@ The following table summarizes the results obtained and compares them with other
 |-------------------------|-----------------|-----------------|------------------------|---------------|
 | Human experts           | ~30%            | -               | -                      | (years?)      |
 | Multiple Towers / VGG-M | 61.1%           | 90.4%           | ~40 million parameters | 7 hours       |
-| Inception-v4            | 64.2%           | 93.8%           | ~8 million parameters  | 12.5 hours    |
+| Inception-v4            | **64.2%**       | **93.8%**       | ~ 8 million parameters | 12.5 hours    |
 
 Momentum SGD (after tuning) and Adam gave equal results. As you can see, the validation accuracy plots are nearly identical :
 ![resultats](https://image.noelshack.com/fichiers/2019/19/5/1557501042-acc.png)
