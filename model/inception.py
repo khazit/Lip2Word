@@ -17,12 +17,23 @@ def inception_model_fn(features, labels, mode, params):
     Returns :
         - Custom Estimator
     """
+    # During inference we feed a dict to the input function
+    if mode == tf.estimator.ModeKeys.PREDICT :
+        features = features["x"]
     # Useful variables
     num_classes = params["num_classes"]
     if (mode == tf.estimator.ModeKeys.TRAIN) :
         is_training = tf.constant(True, dtype=tf.bool)
     else :
         is_training = tf.constant(False, dtype=tf.bool)
+
+    # Uncomment to display image inputs on Tensorboard
+    # tf.summary.image(
+    #     tensor=tf.reshape(
+    #         features[:, :, :, 1],
+    #         [-1, 64, 64, 1]),
+    #     max_outputs=10,
+    #     name="viz")
 
     # Compute logits
     logits = _build_model(features, num_classes, is_training)
@@ -75,13 +86,6 @@ def inception_model_fn(features, labels, mode, params):
     tf.summary.scalar('accuracy', accuracy[1])
     tf.summary.scalar('topk_accuracy', topk_accuracy[1])
     tf.summary.scalar('loss', loss)
-    # Uncomment to display image inputs on Tensorboard
-    # tf.summary.image(
-    #     tensor=tf.reshape(
-    #         features[:, :, :, 1],
-    #         [-1, 64, 64, 1]),
-    #     max_outputs=10,
-    #     name="viz")
 
     # Logging hook
     hook = tf.train.LoggingTensorHook(
