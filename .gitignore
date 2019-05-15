@@ -4,6 +4,7 @@ test_notebooks/**
 tmp/**
 *.ipynb
 *.png
+*.jpg
 !data/word_list.txt
 
 .DS_Store
