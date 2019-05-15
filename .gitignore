@@ -3,6 +3,8 @@ experiments/**
 test_notebooks/**
 tmp/**
 *.ipynb
+*.png
+!data/word_list.txt
 
 .DS_Store
 .ipynb_checkpoints
