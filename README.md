@@ -16,9 +16,7 @@ For humans, adding sight of the speaker to heard speeches improves speech proces
 ## Dataset
 The dataset consists of ~1000 utterances of 500 different words, spoken by different speakers. All videos are 29 frames in length, and the word occurs in the middle of the video. The frames were cropped around the speaker’s mouth and downsized to 64x64.
 
-![frames](https://lh5.googleusercontent.com/McVcrVr8wC7b2GaZHdeFtgJf9MhQXCzcRV7I4dmMJkKmFwbZFGBG1QC9brXc7HQoDWKL38a8hKq5dqpNfmnWKlk-Adm1PsP0pDoJLO_X=s622)
-
-*Joon Son Chung and Andrew Zisserman, “Lip Reading in the Wild*
+![frames](https://image.noelshack.com/fichiers/2019/20/3/1557943626-frames.png)
 
 Link : http://www.robots.ox.ac.uk/~vgg/data/lip_reading/lrw1.html
 
