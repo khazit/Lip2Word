@@ -218,7 +218,7 @@ def _single_frame_stem(input, is_training) :
 
 def stem(inputs, is_training) :
     # Stem on every frame
-    stem_output = [_single_frame_stem(inputs[:, :, :, i], is_training) for i in range(29)]
+    stem_output = [_single_frame_stem(inputs[-1, :, :, i], is_training) for i in range(29)]
     # Concatenate all outputs into a single tensor
     stem_output = tf.concat(
         values=stem_output,
