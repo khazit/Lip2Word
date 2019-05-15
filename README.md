@@ -1,79 +1,73 @@
-# CNN
+## Introduction
+This project was conducted as part of my engineering degree. The goal was to build a lip reading AI that could output words or sentences from a silent video input.
 
-## Lip Reading in the Wild - Joon Son Chung and Andrew Zisserman
-* In lip-reading there is a fundamental limitation on performance due to homophemes (sets of words that sound different but involves identical movements of the speaker's lips). Thus they cannot be distinguished using visual information alone ("mark", "park" and "bark" for eg.) **Need to take account of this ambiguity when assessing the performance of the model**
-* Challenging problem due to intra-class variations (accents, speed of speaking, etc)
-* Using CNNs to recognize individual words from a sequence of lip movements
-* The words are not isolated, as is the case in other lip-reading datasets; as a result, there may be co-articulation of the lips from preceding subsequent words. **Might help against the homophemes (brings more "context")**
-* 4 networks architectures : Early Fusion (2D (grayscale) and 3D) and Multiple Towers (harder to implement)
+### Related work
+There is different ways to tackle this problem (sorted from the lowest to the highest level of abstraction) :
+  * **Lip reading on the phoneme level:** For every frame of the input, predict the corresponding phoneme. The classification problem is easier (only 44 different phonemes in English), but going up to a higher level to form words or sentences can be challenging : (1) a phoneme can be spread over multiple frames, (2) and some phonemes are impossible to differentiate (from a lip movement perspective, there is no way to distinguish between and “p” and a “b” for example).
+  * **Lip reading on the word level:** Parse the video sequence into different subsequences with each one of them containing a single word. Then classify those sequences using a predefined dictionary. This classification problem is more difficult, given that the dictionary should contain a lot of words (>100). But also because we first need to parse the input into different subsequences.
+  *  **Lip reading on the sentence level:** Predict words in a sentence using predefined phrasing. Not really useful in my own opinion.
 
-#### Details about the training :
-* SGD with momentum 0.9 and batch normalisation (but without dropout)
-* Decreasing learning rate (from 1E-2 to 1E-4)
+Here I chose to work on the word level because even if a high accuracy is not achieved, the output can still be used to enhance speech recognition models.
 
-#### Results :
-* 2D models are far more accurate. Multiple Towers are slightly more accurate than Early Fusion (+- 4%)
-* Best top-1 accuracy around 60% (500 different words)
 
-## Large-scale Classification with Convolutional Neural Networks 
-https://www.cv-foundation.org/openaccess/content_cvpr_2014/papers/Karpathy_Large-scale_Video_Classification_2014_CVPR_paper.pdf
+### Possible applications
+For humans, adding sight of the speaker to heard speeches improves speech processing. In the same way, a lip reading AI can be used to enhance some already existing speech recognition models, especially if the audio is noisy (low quality, music in the background, etc.)
 
-#### Architecture :
- * Using shorthand notation, the full architecture is C(96,11,3)-N-P-C(256,5,1)-N-P-C(384,3,1)-C(384,3,1)-C(256,3,1)-P-FC(4096)-FC(4096), where C(d,f,s) indicates a convolutional layer with d filters of spatial size f×f, applied to the input with stride s.FC(n) is a fully connected layer with n nodes. All pooling layers P pool spatially in non-overlapping 2×2 regions and all normalization layers N use the same parameters: k= 2, n= 5, α=10−4, β= 0.5. The final layer is connected to a softmax classifier with dense connections.
- The Early Fusion extension combines in-formation across an entire time window immediately on thepixel level. This is implemented by modifying the filters onthe first convolutional layer in the single-frame model byextending them to be of size 11×11×3×T pixels, where T is some  temporal extent 
- * An effecive approach to speeding up the runtime performance of CNNs is to modify the architecture to contain two separate streams of processing : a context stream that learns features on low-resolution frames and a high-resolution fovea stream that only operates on the middle portion of the frame.
- * The multiresolution architecture aims to strike a compromise by having two seperate streams of processing over two spatial resolutions. The context stream receives the downsampled frames at half the original spatial resolution, while the fovea steam receives the center region at the original resolution.
- * Must ensure that both streams still terminate in a same size layer to be fed to the fully connected layer.
+## Dataset
+The dataset consists of ~1000 utterances of 500 different words, spoken by different speakers. All videos are 29 frames in length, and the word occurs in the middle of the video. The frames were cropped around the speaker’s mouth and downsized to 64x64.
 
-#### Training :
- * SGD, mini-batch (32), momentum of 0.9, weight decay of 0.0005. Initialized with learning rate of 1E-3 (decreasing)
+![frames](https://lh5.googleusercontent.com/McVcrVr8wC7b2GaZHdeFtgJf9MhQXCzcRV7I4dmMJkKmFwbZFGBG1QC9brXc7HQoDWKL38a8hKq5dqpNfmnWKlk-Adm1PsP0pDoJLO_X=s622)
 
-## 3D Convolutional Neural Networks for Human Action Recognition
-http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.442.8617&rep=rep1&type=pdf
+*Joon Son Chung and Andrew Zisserman, “Lip Reading in the Wild*
 
-#### Architecture
- 1. Hardwired kernels to generate multiple chanels of information (difficult to implement)
- 2. 3D convolution with a kernel of size (7x7x3)
- 3. 2x2 subsampling layer
- 4. 3D convolution with a kernel of size (7x6x3) **Not a square because the input image is 60x40**
- 5. 3x3 subsampling
- 6. 2D convolution of 7x4
- 7. fully connected layer
+Link : http://www.robots.ox.ac.uk/~vgg/data/lip_reading/lrw1.html
 
-## Inception
-Medium : https://towardsdatascience.com/a-simple-guide-to-the-versions-of-the-inception-network-7fc52b863202
-Paper : https://arxiv.org/pdf/1602.07261.pdf
-#### Architecture 
- * Stem architecture : https://cdn-images-1.medium.com/max/1600/1*cYjhQ05zLXdHn363TsPrLQ.jpeg
- * Modules : https://cdn-images-1.medium.com/max/640/1*KrBAIZjcrlXu6JPiPQj2vQ.jpeg
- * Global architecture
+## Network architecture and training
+### Architecture
+This repository contains the source code for two different architectures :
 
-## Batch Normalization
-https://fr.coursera.org/lecture/deep-neural-network/normalizing-activations-in-a-network-4ptp2
- * Normalize values inside a NN to speed up the learning. 
- * We normalize the values before the activation function. It is done more often. Recommended by Andrew Ng.
- * Two trainable parameters, Gamma and Beta to avoid having a mean=0 variance=1 all the time
+#### Multiple Towers
+The Multiple Towers architecture is largely inspired by the VGG-M architecture, but adapted to a video input. A convolutional layer and a pooling layer is first applied on every frame. We then concatenate all the outputs into a single 3D matrix. We finally apply a set a convolutions/poolings (see paper for more details)
 
-# Code optimization
+*Paper : Joon Son Chung and Andrew Zisserman, “Lip Reading in the Wild”*
 
-## Data pipeline using tf.data to optimize performance
-https://www.tensorflow.org/guide/performance/datasets
+#### Inception-v4
+The other model is a slightly modified Inception-v4 architecture. This model is based on several very small convolutions, grouped in “blocks”, in order to drastically reduce the number of parameters Here, multiple frames pass through the same layers in the “stem” block because of the video input. We then concatenate the output in the same way that we did with the Multiple Towers architecture.
+The main advantage of this architecture is to allow us to have a very deep model with multiple blocks and layers without bearing the weight of a huge number of parameters.
 
-#### Pipelining
-Pipelining overlaps the preprocessing and model execution of a training step. While the accelerator is performing training step N, the CPU is preparing the data for step N+1 (to reduce idle time)
-```python
-dataset = dataset.prefetch(buffer_size=FLAGS.prefetch_buffer_size)
-return dataset
-```
+*Paper : C.Szegedy, S.Ioffe, V.Vanhoucke, A.Alemi, “Inception-v4, Inception-ResNet and the Impact of Residual Connections on Learning”*
 
-## Importing Data - Tensorflow
-https://www.tensorflow.org/guide/datasets#basic_mechanics
+### Training
 
-# RNN
-## Reccurent Neural Networks - Coursera
-https://fr.coursera.org/lecture/nlp-sequence-models/recurrent-neural-network-model-ftkzt
-#### RNN Model
-A feature learned in t, can generalize quickly to something in t+i. It's similar to what convolutional neural networks do. Where things learned for one part of the image can generalize quickly for other parts of the image.
+#### Data pipeline
+One of the most important, but also time consuming aspect of this project was setting up a good data pipeline. Given the fact that the dataset couldn’t fit in memory, the performance of the pipeline was very important : at every iteration, it needed to fetch a batch of training examples from the disk, apply preprocessing on it, data-augmentation, and finally feed it to the neural network.
+To achieve that I chose to use Tensorflow’s data input pipeline. It allow us to do everything mentioned above, but also to achieve a peak level of performance by using the CPU and GPU at the same time. As a result the data for the next step is ready before the current step has finished.
+>Pipelining overlaps the preprocessing and model execution of a training step. While the accelerator is performing training step N, the CPU is preparing the data for step N+1. Doing so reduces the step time to the maximum (as opposed to the sum) of the training and the time it takes to extract and transform the data.
+>https://www.tensorflow.org/guide/performance/datasets
 
-#### Different types of RNNs
-Input the frames one at a time. Rather than having to produce an output at every time-step we can have the RNN see all the frames and prduce an output at the last time-step. Many-to-one architecture.
+#### Details
+The two networks were trained on a Nvidia GTX 1080 Ti GPU and an Intel Xeon CPU for 25 epochs or until the validation loss started increasing, whichever come first. The best results were obtained using Momentum SGD and Adam. The hyperparameters for the fine tuned models are stored in .json files (hyperparameter directory, see repo).
+
+## Results
+The following table summarizes the results obtained and compares them with other methods.
+
+|                         |  Top-1 accuracy | Top-10 accuracy | Size of the model      | Training time |
+|-------------------------|-----------------|-----------------|------------------------|---------------|
+| Human experts           | ~30%            | -               | -                      | (years?)      |
+| Multiple Towers / VGG-M | 61.1%           | 90.4%           | ~40 million parameters | 7 hours       |
+| Inception-v4            | **64.2%**       | **93.8%**       | ~ 8 million parameters | 12.5 hours    |
+
+Momentum SGD (after tuning) and Adam gave equal results. As you can see, the validation accuracy plots are nearly identical :
+![resultats](https://image.noelshack.com/fichiers/2019/19/5/1557501042-acc.png)
+
+## Conclusion and extensions
+The Inception-v4 architecture achieved SOTA in both top-1 and top-10 accuracies. However the margin is small. There appears to be a plateau in the accuracy results, which can be attributed to some words in the dataset that are nearly homophones (“groups” and “troops”, or “ground” and “around”). The distinction between the singular and plural form is also difficult to establish (as in “report” and “reports” which are considered different words in the dataset).
+
+Using LSTMs and a RNN architecture could help increase the accuracy of the model, as they are more effective with temporal data.
+Conditional probability can also be used to enhance the model. In the sentence “The experiments were conducted in [unknown word]”, it’s obvious that the missing word is “groups” and not “troops” for example. A CNN used in pair with a Markov Chain can be extremely powerful to go from words to sentences.
+
+The progress made during this project is still very significant. We achieved higher accuracy with a smaller model (5 times less parameters), which is very important for putting it in production.
+
+## Acknowledgements
+Advice given by my supervisor, Clement Chatelain, has been a great help in this project and I would like to thank him for his valuable and constructive suggestions.
+I’m also grateful to Rob Cooper at BBC Research & Development for his help in obtaining the dataset.
