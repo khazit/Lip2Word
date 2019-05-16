@@ -1,5 +1,6 @@
 import os
 import cv2
+import sys
 import random
 import argparse
 import face_recognition
@@ -8,7 +9,7 @@ import tensorflow as tf
 import matplotlib.pyplot as plt
 from model.inception import inception_model_fn
 
-tf.logging.set_verbosity(tf.logging.INFO)
+tf.logging.set_verbosity(tf.logging.FATAL)
 
 def videoToArray(path) :
     """
@@ -70,7 +71,7 @@ def frameAdjust(video):
             idx.sort()
             return video[:, :, idx]
         else :
-            print("Not enough frames")
+            sys.exit("Not enough frames")
 
 def mouthCrop(video) :
     """
@@ -88,9 +89,11 @@ def mouthCrop(video) :
     for i in range(n_frames) :
         # Compute the face locations (right/left eye and nose tip)
         face_locations = face_recognition.face_landmarks(
-                video[:, :, i],
-                model="small"
+            video[:, :, i],
+            model="small"
         )
+        if len(face_locations) == 0 :
+            sys.exit("No face detected in frame {}".format(i))
         # To make sure the crop around the mouth just right (not too zoomed
         # in or zoomed out), the distance between the eyes is used as
         # a reference. The leftmost point of the left eye and the rightmost point
@@ -116,6 +119,12 @@ def mouthCrop(video) :
 
 def reshapeAndConvert(video) :
     """
+    Reshape the video to a 4D array before feeding it to the model function
+    Also apply normalization to go from [0-255] to [0-1]
+    Args :
+        - 3D numpy array
+    Returns :
+        - 4D numpy array
     """
     size = video.shape[0]
     n_frames = video.shape[2]
@@ -138,7 +147,7 @@ def create_dict_word_list(path) :
             count += 1
     return my_dict
 
-# Debugging functions
+# Debugging function
 def _write_video(video) :
     writer = cv2.VideoWriter(
         "tmp/output.avi",
@@ -220,13 +229,18 @@ if __name__ == '__main__':
         )
     )
 
-    # Insights and predictions
+    # Print predictions
     predictions = list(predictions)[0]
     predicted_class = predictions["classes"]
     top_k_classes = (-predictions["probabilities"]).argsort()[:int(args.k)]
     predicted_words = list()
+    print("Predictions :")
     for label in top_k_classes :
         predicted_words.append(word_dict[label])
+        print("* {} : {} %".format(
+            word_dict[label],
+            predictions["probabilities"][label]*100
+        ))
 
     # Draw plot and write a .png file
     print("Rendering prediction plot to {}.png".format(args.output))
