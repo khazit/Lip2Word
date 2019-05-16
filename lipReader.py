@@ -52,7 +52,7 @@ def videoToArray(path) :
 
 def frameAdjust(video):
     """
-    Select randomly a fixed number of frames from the input video
+    Select a fixed number of frames from the input video
     Args :
         - 3D numpy array
     Returns :
@@ -66,9 +66,9 @@ def frameAdjust(video):
     else :
         if n_frames > target :
             print("Adjusting number of frames")
-            idx = [i for i in range(n_frames)]
-            idx = random.sample(idx, target)
-            idx.sort()
+            idx = np.linspace(0, n_frames-1, 29)
+            idx = np.around(idx, 0).astype(np.int32)
+            print("Indexes of the selected frames : \n{}".format(idx))
             return video[:, :, idx]
         else :
             sys.exit("Not enough frames")
@@ -148,9 +148,9 @@ def create_dict_word_list(path) :
     return my_dict
 
 # Debugging function
-def _write_video(video) :
+def _write_video(video, path) :
     writer = cv2.VideoWriter(
-        "tmp/output.avi",
+        path+".avi",
         cv2.VideoWriter_fourcc(*"XVID"),
         15,
         (256,256)
@@ -210,7 +210,7 @@ if __name__ == '__main__':
     print("Cropping video around the speaker's mouth (may take time)")
     video = mouthCrop(video)
     video = reshapeAndConvert(video)
-    _write_video(video)
+    _write_video(video, args.output)
 
     # Create the classifier
     print("Creating classifier from {}".format(args.checkpoint_path))
