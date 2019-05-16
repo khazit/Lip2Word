@@ -6,11 +6,9 @@ import face_recognition
 import numpy as np
 import tensorflow as tf
 import matplotlib.pyplot as plt
-from model.input_fn import predict_input_fn
 from model.inception import inception_model_fn
 
 tf.logging.set_verbosity(tf.logging.INFO)
-
 
 def videoToArray(path) :
     """
@@ -61,10 +59,18 @@ def frameAdjust(video):
     """
     target = 29
     n_frames = video.shape[2]
-    idx = [i for i in range(n_frames)]
-    idx = random.sample(idx, target)
-    idx.sort()
-    return video[:, :, idx]
+    if target == n_frames :
+        print("Perfect number of frames !")
+        return video
+    else :
+        if n_frames > target :
+            print("Adjusting number of frames")
+            idx = [i for i in range(n_frames)]
+            idx = random.sample(idx, target)
+            idx.sort()
+            return video[:, :, idx]
+        else :
+            print("Not enough frames")
 
 def mouthCrop(video) :
     """
@@ -132,6 +138,29 @@ def create_dict_word_list(path) :
             count += 1
     return my_dict
 
+# Debugging functions
+def _write_video(video) :
+    writer = cv2.VideoWriter(
+        "tmp/output.avi",
+        cv2.VideoWriter_fourcc(*"XVID"),
+        15,
+        (256,256)
+    )
+    video = video * 255
+    for i in range(29) :
+        writer.write(
+            cv2.resize(
+                cv2.cvtColor(
+                    video[0, :, :, i].astype('uint8'),
+                    cv2.COLOR_GRAY2BGR
+                ),
+                dsize=(256, 256),
+                interpolation=cv2.INTER_LINEAR
+            )
+        )
+    writer.release()
+
+
 parser = argparse.ArgumentParser()
 parser.add_argument(
     '--file',
@@ -148,9 +177,16 @@ parser.add_argument(
     default=".",
     help="Name of the ouput file"
 )
+parser.add_argument(
+    '--k',
+    default="10",
+    help="Show top-k predictions"
+)
+
 
 if __name__ == '__main__':
     # Useful stuff
+    random.seed(4100242702031)
     args = parser.parse_args()
     assert os.path.isfile(args.file), "Video file not found"
     im_size = 64
@@ -165,6 +201,7 @@ if __name__ == '__main__':
     print("Cropping video around the speaker's mouth (may take time)")
     video = mouthCrop(video)
     video = reshapeAndConvert(video)
+    _write_video(video)
 
     # Create the classifier
     print("Creating classifier from {}".format(args.checkpoint_path))
@@ -174,30 +211,35 @@ if __name__ == '__main__':
         model_dir=args.checkpoint_path
     )
     # Inference time !
+    print("Computing predictions")
     predictions = classifier.predict(
         input_fn=tf.estimator.inputs.numpy_input_fn(
             {"x": video},
             batch_size=1,
-            shuffle=False,
+            shuffle=False
         )
     )
 
     # Insights and predictions
     predictions = list(predictions)[0]
     predicted_class = predictions["classes"]
-    k = 10
-    top_k_classes = (-predictions["probabilities"]).argsort()[:k]
+    top_k_classes = (-predictions["probabilities"]).argsort()[:int(args.k)]
     predicted_words = list()
     for label in top_k_classes :
         predicted_words.append(word_dict[label])
+
     # Draw plot and write a .png file
-    idx = [2*i for i in range(10)]
-    plt.figure(figsize=(15, 10))
+    print("Rendering prediction plot to {}.png".format(args.output))
+    idx = [2*i for i in range(int(args.k))]
+    plt.figure(figsize=(int(args.k)+5, 10))
     plt.bar(
         x=idx,
         height=predictions["probabilities"][top_k_classes]
     )
     plt.xlabel('Words')
     plt.ylabel('Probabilities')
+    plt.title("Top {} most plausible words".format(args.k))
     plt.xticks(idx, predicted_words)
     plt.savefig(args.output+".png")
+
+    print("Done.")
