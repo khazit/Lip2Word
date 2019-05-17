@@ -166,7 +166,8 @@ def _build_model(features, num_classes, is_training) :
             batch_norm(
                 inputs=layer,
                 is_training=is_training,
-    		    layer_name="bn_conv1"
+    		layer_name="bn_conv1",
+                reuse=True
             )
         )
     # Concatenate tensors along time dimension
