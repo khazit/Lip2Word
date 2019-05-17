@@ -41,7 +41,7 @@ The main advantage of this architecture is to allow us to have a very deep model
 One of the most important, but also time consuming aspect of this project was setting up a good data pipeline. Given the fact that the dataset couldn’t fit in memory, the performance of the pipeline was very important : at every iteration, it needed to fetch a batch of training examples from the disk, apply preprocessing on it, data-augmentation, and finally feed it to the neural network.
 To achieve that I chose to use Tensorflow’s data input pipeline. It allow us to do everything mentioned above, but also to achieve a peak level of performance by using the CPU and GPU at the same time. As a result the data for the next step is ready before the current step has finished.
 >Pipelining overlaps the preprocessing and model execution of a training step. While the accelerator is performing training step N, the CPU is preparing the data for step N+1. Doing so reduces the step time to the maximum (as opposed to the sum) of the training and the time it takes to extract and transform the data.
->https://www.tensorflow.org/guide/performance/datasets
+>*https://www.tensorflow.org/guide/performance/datasets*
 
 #### Details
 The two networks were trained on a Nvidia GTX 1080 Ti GPU and an Intel Xeon CPU for 25 epochs or until the validation loss started increasing, whichever come first. The best results were obtained using Momentum SGD and Adam. The hyperparameters for the fine tuned models are stored in .json files (hyperparameter directory, see repo).
@@ -53,14 +53,28 @@ The following table summarizes the results obtained and compares them with other
 |-------------------------|-----------------|-----------------|------------------------|---------------|
 | Human experts           | ~30%            | -               | -                      | (years?)      |
 | Multiple Towers / VGG-M | 61.1%           | 90.4%           | ~40 million parameters | 7 hours       |
-| Inception-v4            | **64.2%**       | **93.8%**       | ~ 8 million parameters | 12.5 hours    |
+| **Inception-v4**        | **64.2%**       | **93.8%**       | **~8 million parameters**| **12.5 hours**|
 
 Momentum SGD (after tuning) and Adam gave equal results. As you can see, the validation accuracy plots are nearly identical :
 ![resultats](https://image.noelshack.com/fichiers/2019/19/5/1557501042-acc.png)
 
-## Conclusion and extensions
-The Inception-v4 architecture achieved SOTA in both top-1 and top-10 accuracies. However the margin is small. There appears to be a plateau in the accuracy results, which can be attributed to some words in the dataset that are nearly homophones (“groups” and “troops”, or “ground” and “around”). The distinction between the singular and plural form is also difficult to establish (as in “report” and “reports” which are considered different words in the dataset).
+## But can it really read lips ?
+The main goal of this project was to build an end-to-end lipreader generic enough to be used on any video. The preprocessing required to go from the input to a 64x64x29 matrix gives rise to two problems : (1) how to reduce the spacial dimension of the video, ie cropping it around the speaker's mouth, but also (2) how to reduce the temporal dimension, ie going from x numbers of frames to 29.
+The first problem is solved by using Adam Geitgey's face recognition Python API (see lipReader.py for more interesting details). The solution to the second one is pretty straightforward : we just select 29 evenly spaced frames from the input video.
 
+The script produces 2 outputs. 
+  * A video that represents the input that is fed to the neural network (it was used a lot during debugging).
+  * A bar graph that summarises the output of the model :
+![predictions](https://image.noelshack.com/fichiers/2019/20/5/1558109150-absolutely-camera2.png)  
+
+The results were very promising. The model is however tricky when used on videos that are poorly framed or videos with low contrast and high brightness.
+
+## Conclusion and extensions
+The Inception-v4 architecture achieved SOTA in both top-1 and top-10 accuracies. However the margin is small. There appears to be a plateau in the accuracy results, which can be attributed to different factors :
+  * Some words in the dataset that are nearly homophones (“groups” and “troops”, or “ground” and “around”). 
+  * The distinction between the singular and plural form is also difficult to establish (as in “report” and “reports” which are considered different words in the dataset).
+  * Some videos in the dataset are poorly framed. 
+  
 Using LSTMs and a RNN architecture could help increase the accuracy of the model, as they are more effective with temporal data.
 Conditional probability can also be used to enhance the model. In the sentence “The experiments were conducted in [unknown word]”, it’s obvious that the missing word is “groups” and not “troops” for example. A CNN used in pair with a Markov Chain can be extremely powerful to go from words to sentences.
 
