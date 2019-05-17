@@ -32,8 +32,10 @@ reader = tf.train.NewCheckpointReader(tf.train.latest_checkpoint(model_dir))
 print('\nCount the number of parameters from {}'.format(model_dir))
 param_map = reader.get_variable_to_shape_map()
 total_count = 0
+# Put all the things to skip here :
+black_list = ["global_step", "Adam"]
 for k, v in param_map.items():
-    if 'Momentum' not in k and 'global_step' not in k:
+    if not any(sub in k for sub in black_list):
         temp = np.prod(v)
         total_count += temp
         print('%s: %s => %d' % (k, str(v), temp))
