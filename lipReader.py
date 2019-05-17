@@ -1,7 +1,13 @@
+"""
+Given a input video (.mp4), outputs the probabilities of the k most
+plausible words.
+Also outputs a .avi file that shows the input of the neural network and
+a summary bar graph
+"""
+
 import os
 import cv2
 import sys
-import random
 import argparse
 import face_recognition
 import numpy as np
@@ -195,7 +201,6 @@ parser.add_argument(
 
 if __name__ == '__main__':
     # Useful stuff
-    random.seed(4100242702031)
     args = parser.parse_args()
     assert os.path.isfile(args.file), "Video file not found"
     im_size = 64
