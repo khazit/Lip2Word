@@ -16,6 +16,8 @@ import matplotlib.pyplot as plt
 from model.inception import inception_model_fn
 
 tf.logging.set_verbosity(tf.logging.FATAL)
+plt.style.use(['dark_background', 'presentation.mplstyle'])
+
 
 def videoToArray(path) :
     """
@@ -31,6 +33,7 @@ def videoToArray(path) :
     # Some useful info about the video
     width = int(vidObj.get(3))
     height = int(vidObj.get(4))
+    fps = int(vidObj.get(5))
     n_frames = int(vidObj.get(7))
     print("Video info : {}x{}, {} frames".format(
         height,
@@ -54,7 +57,7 @@ def videoToArray(path) :
             # Save to one 4D numpy array
             video[:, :, i] = frame
             i += 1
-    return video
+    return video, n_frames, fps
 
 def frameAdjust(video):
     """
@@ -71,13 +74,21 @@ def frameAdjust(video):
         return video
     else :
         if n_frames > target :
+            # If number of frames is more than 29, we select
+            # 29 evenly distributed frames
             print("Adjusting number of frames")
             idx = np.linspace(0, n_frames-1, 29)
             idx = np.around(idx, 0).astype(np.int32)
             print("Indexes of the selected frames : \n{}".format(idx))
             return video[:, :, idx]
         else :
-            sys.exit("Not enough frames")
+            # If number of frames is less than 29, duplicate last
+            # frame at the end of the video
+            output_video = np.zeros((video.shape[0], video.shape[1], 29)).astype(np.uint8)
+            output_video[:, :, :n_frames] = video
+            for i in range(target-n_frames+1) :
+                output_video[:, :, i+n_frames-1] = output_video[:, :, n_frames-1]
+            return output_video
 
 def mouthCrop(video) :
     """
@@ -154,11 +165,11 @@ def create_dict_word_list(path) :
     return my_dict
 
 # Debugging function
-def _write_video(video, path) :
+def _write_video(video, path, fps) :
     writer = cv2.VideoWriter(
         path+".avi",
         cv2.VideoWriter_fourcc(*"XVID"),
-        15,
+        fps,
         (256,256)
     )
     video = video * 255
@@ -210,12 +221,15 @@ if __name__ == '__main__':
 
     # Preprocessing
     print("Reading frames from {}".format(args.file))
-    video = videoToArray(args.file)
+    video, n_frames_original, fps = videoToArray(args.file)
     video = frameAdjust(video)
     print("Cropping video around the speaker's mouth (may take time)")
     video = mouthCrop(video)
     video = reshapeAndConvert(video)
-    _write_video(video, args.output)
+    # Used for debugging, not important :
+    # fps_output aligns the input video used by the model with the original video
+    fps_output = int(fps * (n_frames / n_frames_original)) 
+    _write_video(video, args.output, fps_output)
 
     # Create the classifier
     print("Creating classifier from {}".format(args.checkpoint_path))
@@ -249,16 +263,21 @@ if __name__ == '__main__':
 
     # Draw plot and write a .png file
     print("Rendering prediction plot to {}.png".format(args.output))
-    idx = [2*i for i in range(int(args.k))]
-    plt.figure(figsize=(int(args.k)+5, 10))
+    idx = [3*i for i in range(int(args.k))]
+    plt.figure(figsize=(int(args.k)//2+5, 5))
     plt.bar(
         x=idx,
-        height=predictions["probabilities"][top_k_classes]
+        height=predictions["probabilities"][top_k_classes],
+        color="goldenrod"
     )
     plt.xlabel('Words')
     plt.ylabel('Probabilities')
-    plt.title("Top {} most plausible words".format(args.k))
+    plt.title("Most plausible words".format(args.k))
     plt.xticks(idx, predicted_words)
-    plt.savefig(args.output+".png")
+    plt.savefig(
+        args.output+".png",
+        transparent=False,
+        bbox_inches="tight"
+    )
 
     print("Done.")
