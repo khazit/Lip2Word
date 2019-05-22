@@ -69,6 +69,12 @@ The script produces 2 outputs.
 
 The results were very promising. The model is however tricky when used on videos that are poorly framed or videos with low contrast and high brightness.
 
+When tested on videos that were not part of the initial dataset (demo video : https://www.youtube.com/watch?v=Hn8WIW8iZDc), the model did pretty good, but showed the following flaws :
+  * Couldn't distinguish between singular/plural
+  * Even though everytime, the ground truth was in the top-5 predictions, the model couldn't achieve a top-1 accuracy comparable to that of the dataset (~64% accuracy on the validation and test sets).
+  
+However in every example, the model did recognize nearly all the phonemes. But it had trouble with the temporal aspect, giving a nearly equal probability to the words that contain one of those phonemes.  
+
 ## Conclusion and extensions
 The Inception-v4 architecture achieved SOTA in both top-1 and top-10 accuracies. However the margin is small. There appears to be a plateau in the accuracy results, which can be attributed to different factors :
   * Some words in the dataset that are nearly homophones (“groups” and “troops”, or “ground” and “around”). 
