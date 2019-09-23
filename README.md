@@ -1,5 +1,5 @@
 ## Introduction
-___
+
 This project was conducted as part of my engineering degree. The goal was to build a lip reading AI that could output words or sentences from a silent video input.
 
 ### Related work
@@ -15,7 +15,7 @@ Here I chose to work on the word level because even if a high accuracy is not ac
 For humans, adding sight of the speaker to heard speeches improves speech processing. In the same way, a lip reading AI can be used to enhance some already existing speech recognition models, especially if the audio is noisy (low quality, music in the background, etc.)
 
 ## Dataset
-___
+
 The dataset consists of ~1000 utterances of 500 different words, spoken by different speakers. All videos are 29 frames in length, and the word occurs in the middle of the video. The frames were cropped around the speaker’s mouth and downsized to 64x64.
 
 ![frames](https://image.noelshack.com/fichiers/2019/20/3/1557943626-frames.png)
@@ -23,7 +23,7 @@ The dataset consists of ~1000 utterances of 500 different words, spoken by diffe
 Link : http://www.robots.ox.ac.uk/~vgg/data/lip_reading/lrw1.html
 
 ## Network architecture and training
-___
+
 ### Architecture
 This repository contains the source code for two different architectures :
 
@@ -50,7 +50,7 @@ To achieve that I chose to use Tensorflow’s data input pipeline. It allow us t
 The two networks were trained on a Nvidia GTX 1080 Ti GPU and an Intel Xeon CPU for 25 epochs or until the validation loss started increasing, whichever come first. The best results were obtained using Momentum SGD and Adam. The hyperparameters for the fine tuned models are stored in .json files (hyperparameter directory, see repo).
 
 ## Results
-____
+_
 The following table summarizes the results obtained and compares them with other methods.
 
 |                         |  Top-1 accuracy | Top-10 accuracy | Size of the model      | Training time |
@@ -63,7 +63,7 @@ Momentum SGD (after tuning) and Adam gave equal results. As you can see, the val
 ![resultats](https://image.noelshack.com/fichiers/2019/19/5/1557501042-acc.png)
 
 ## But can it really read lips ?
-___
+
 The main goal of this project was to build an end-to-end lipreader generic enough to be used on any video. The preprocessing required to go from the input to a 64x64x29 matrix gives rise to two problems : (1) how to reduce the spacial dimension of the video, ie cropping it around the speaker's mouth, but also (2) how to reduce the temporal dimension, ie going from x numbers of frames to 29.
 The first problem is solved by using Adam Geitgey's face recognition Python API (see lipReader.py for more interesting details). The solution to the second one is pretty straightforward : we just select 29 evenly spaced frames from the input video.
 
@@ -81,7 +81,7 @@ When tested on videos that were not part of the initial dataset ([Demo video](ht
 However in every example, the model did recognize nearly all the phonemes. But it had trouble with the temporal aspect, giving a nearly equal probability to the words that contain one of those phonemes.  
 
 ## Conclusion and extensions
-___
+
 The Inception-v4 architecture achieved SOTA in both top-1 and top-10 accuracies. However the margin is small. There appears to be a plateau in the accuracy results, which can be attributed to different factors :
   * Some words in the dataset that are nearly homophones (“groups” and “troops”, or “ground” and “around”).
   * The distinction between the singular and plural form is also difficult to establish (as in “report” and “reports” which are considered different words in the dataset).
@@ -93,6 +93,6 @@ Conditional probability can also be used to enhance the model. In the sentence �
 The progress made during this project is still very significant. We achieved higher accuracy with a smaller model (5 times less parameters), which is very important for putting it in production.
 
 ## Acknowledgements
-___
+
 Advice given by my supervisor, Clement Chatelain, has been a great help in this project and I would like to thank him for his valuable and constructive suggestions.
 I’m also grateful to Rob Cooper at BBC Research & Development for his help in obtaining the dataset.
