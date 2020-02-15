@@ -73,7 +73,7 @@ The script produces 2 outputs.
 
 The results were very promising. The model is however tricky when used on videos that are poorly framed or videos with low contrast and high brightness.
 
-When tested on videos that were not part of the initial dataset ([Demo video](https://www.youtube.com/watch?v=Hn8WIW8iZDc)), the model did pretty good, but showed the following flaws :
+When tested on videos that were not part of the initial dataset ([Demo video](https://www.youtube.com/watch?v=ZWOyrZUun2s)), the model did pretty good, but showed the following flaws :
   * Couldn't distinguish between singular/plural
   * Even though everytime, the ground truth was in the top-5 predictions, the model couldn't achieve a top-1 accuracy comparable to that of the dataset (~64% accuracy on the validation and test sets).
 
