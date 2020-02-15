@@ -59,8 +59,7 @@ The following table summarizes the results obtained and compares them with other
 | Multiple Towers / VGG-M | 61.1%           | 90.4%           | ~40 million parameters | 7 hours       |
 | **Inception-v4**        | **64.2%**       | **93.8%**       | **~8 million parameters**| **12.5 hours**|
 
-Momentum SGD (after tuning) and Adam gave equal results. As you can see, the validation accuracy plots are nearly identical :
-![resultats](https://image.noelshack.com/fichiers/2019/19/5/1557501042-acc.png)
+Momentum SGD (after tuning) and Adam gave equal results.
 
 ## But can it really read lips ?
 
