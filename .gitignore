@@ -1,4 +1,5 @@
 data/**
+presentation.mplstyle
 experiments/**
 test_notebooks/**
 tmp/**
