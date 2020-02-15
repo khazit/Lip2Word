@@ -68,8 +68,8 @@ The first problem is solved by using Adam Geitgey's face recognition Python API 
 
 The script produces 2 outputs.
   * A video that represents the input that is fed to the neural network (it was used a lot during debugging).
-  * A bar graph that summarises the output of the model :
-![predictions](https://image.noelshack.com/fichiers/2019/20/5/1558109150-absolutely-camera2.png)  
+  * A bar graph that summarises the output of the model. For the word "Change" for example, the following graph is obtained:
+![predictions](https://raw.githubusercontent.com/khazit/Lip2Word/ressources/img/change.png)  
 
 The results were very promising. The model is however tricky when used on videos that are poorly framed or videos with low contrast and high brightness.
 
